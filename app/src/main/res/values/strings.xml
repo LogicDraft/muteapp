@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">MUTE.</string>
+
+    <!-- Main screen -->
+    <string name="status_muted">MUTED</string>
+    <string name="status_active">ACTIVE</string>
+    <string name="hint_muted">Tap to restore sound</string>
+    <string name="hint_active">Tap to go silent</string>
+    <string name="permission_title">One-time setup</string>
+    <string name="permission_body">MUTE. needs Do Not Disturb access to control ringer, media, and call sounds in one tap. This isn\'t a normal permission dialog — Android opens a system settings screen for it.</string>
+    <string name="permission_grant">Grant Do Not Disturb access</string>
+    <string name="permission_missing_short">DND access needed</string>
+    <string name="settings_link">Settings</string>
+    <string name="usage_hint">Add the MUTE. Quick Settings tile or home-screen widget for one-tap access without opening the app.</string>
+
+    <!-- Quick Settings tile -->
+    <string name="tile_label_muted">Muted</string>
+    <string name="tile_label_active">Unmuted</string>
+    <string name="tile_label_permission">Tap to allow</string>
+
+    <!-- Widget -->
+    <string name="widget_label">MUTE</string>
+    <string name="widget_status_active">Ready</string>
+    <string name="widget_status_muted">Muted</string>
+    <string name="widget_status_muted_countdown">Muted - %1$s left</string>
+    <string name="widget_wide_description">Mute status</string>
+
+    <!-- Notification -->
+    <string name="notif_channel_name">Silent mode status</string>
+    <string name="notif_channel_desc">Shows when MUTE. has silenced the phone</string>
+    <string name="notif_title">Silent mode on</string>
+    <string name="notif_text">Tap to restore sound</string>
+    <string name="notif_action_restore">Restore</string>
+
+    <!-- Settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="setting_exclude_alarm_title">Keep alarm audible</string>
+    <string name="setting_exclude_alarm_desc">Don\'t touch the alarm stream when muting, so alarms still sound</string>
+    <string name="setting_dnd_level_title">Do Not Disturb level</string>
+    <string name="setting_dnd_total_silence">Total Silence</string>
+    <string name="setting_dnd_total_silence_desc">Blocks everything, including alarms routed through notifications</string>
+    <string name="setting_dnd_priority">Priority Only</string>
+    <string name="setting_dnd_priority_desc">Follows your Android priority-interruption rules</string>
+    <string name="setting_auto_restore_title">Auto-restore timer</string>
+    <string name="setting_auto_restore_desc">Safety net: unmute automatically if you forget to</string>
+    <string name="setting_auto_restore_off">Off</string>
+    <string name="setting_notification_title">Persistent notification</string>
+    <string name="setting_notification_desc">Show a low-priority \"Silent mode on\" notification while muted</string>
+</resources>

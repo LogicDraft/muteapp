@@ -1,0 +1,19 @@
+<resources>
+    <!-- The app is intentionally always dark, matching Nothing OS's monochrome look -
+         it does not follow system light/dark mode. -->
+    <style name="Theme.Mute" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/true_black</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+
+    <style name="Theme.Mute.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/true_black</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/true_black</item>
+        <item name="postSplashScreenTheme">@style/Theme.Mute</item>
+    </style>
+</resources>

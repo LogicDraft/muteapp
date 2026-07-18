@@ -1,0 +1,12 @@
+<resources>
+    <!-- Nothing OS-inspired monochrome palette. One accent, used sparingly. -->
+    <color name="true_black">#FF000000</color>
+    <color name="near_black">#FF0A0A0A</color>
+    <color name="ink_grey">#FF1A1A1A</color>
+    <color name="line_grey">#FF2E2E2E</color>
+    <color name="dim_grey">#FF8A8A8A</color>
+    <color name="off_white">#FFF5F5F0</color>
+    <color name="pure_white">#FFFFFFFF</color>
+    <color name="signal_red">#FFE01B24</color>
+    <color name="signal_red_dim">#FF7A0E13</color>
+</resources>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Required to read/set ringer + Do Not Disturb state. Not a runtime dialog permission;
+         must be granted by the user via Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS. -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <!-- Confirmation haptic on toggle. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Re-arm the optional auto-restore timer after a reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Android 13+ runtime permission for the persistent "Silent mode on" notification. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:name=".MuteApp"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Mute">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Mute.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_title"
+            android:theme="@style/Theme.Mute" />
+
+        <!-- Quick Settings tile: the primary, no-app-UI entry point. -->
+        <service
+            android:name=".tile.MuteTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_active"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
+        </service>
+
+        <!-- 1x1 home-screen widget: the secondary no-app-UI entry point. -->
+        <receiver
+            android:name=".widget.MuteWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_mute_info" />
+        </receiver>
+
+        <!-- 2x1 home-screen widget with state and auto-restore countdown. -->
+        <receiver
+            android:name=".widget.MuteWideWidgetProvider"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_mute_wide_info" />
+        </receiver>
+
+        <!-- Shared toggle target for the widget tap and the notification's "Restore" action. -->
+        <receiver
+            android:name=".receiver.ToggleReceiver"
+            android:exported="false" />
+
+        <!-- Re-arms the auto-restore AlarmManager alarm after a reboot (alarms don't survive one). -->
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Fires the optional "auto-unmute after N hours" safety net. -->
+        <receiver
+            android:name=".receiver.AutoRestoreReceiver"
+            android:exported="false" />
+
+    </application>
+
+</manifest>
