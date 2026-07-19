@@ -1,0 +1,2 @@
+[mute-app-schedule-and-animations-prompt.md](mute-app-schedule-and-animations-prompt.md) Analyse the each Concepts and Build.
+replace in entire/any ever logicdraftlabs with logicdraftlabs Ex: com.logicdraftlabs.mute with com.logicdraftlabs.mute. In Settings, All a Developer details [ Email : logicdraftlabs@gmail.com and GitHub: [https://github.com/LogicDraft](https://github.com/LogicDraft)

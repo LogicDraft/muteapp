@@ -1,10 +1,10 @@
-package com.gowtham.mute.receiver
+package com.logicdraftlabs.mute.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.gowtham.mute.core.MuteController
-import com.gowtham.mute.widget.MuteWidgetProvider
+import com.logicdraftlabs.mute.core.MuteController
+import com.logicdraftlabs.mute.widget.MuteWidgetProvider
 
 /**
  * The mute/unmute state itself lives in SharedPreferences and in the phone's own audio/DND

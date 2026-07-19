@@ -1,7 +1,7 @@
-package com.gowtham.mute
+package com.logicdraftlabs.mute
 
 import android.app.Application
-import com.gowtham.mute.notification.MuteNotificationHelper
+import com.logicdraftlabs.mute.notification.MuteNotificationHelper
 
 class MuteApp : Application() {
     override fun onCreate() {

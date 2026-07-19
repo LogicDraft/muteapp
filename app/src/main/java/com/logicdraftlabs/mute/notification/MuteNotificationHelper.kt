@@ -1,4 +1,4 @@
-package com.gowtham.mute.notification
+package com.logicdraftlabs.mute.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,9 +9,9 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.gowtham.mute.R
-import com.gowtham.mute.receiver.ToggleReceiver
-import com.gowtham.mute.ui.MainActivity
+import com.logicdraftlabs.mute.R
+import com.logicdraftlabs.mute.receiver.ToggleReceiver
+import com.logicdraftlabs.mute.ui.MainActivity
 
 /**
  * The persistent, low-priority "Silent mode on" notification. There's no sound to confirm the

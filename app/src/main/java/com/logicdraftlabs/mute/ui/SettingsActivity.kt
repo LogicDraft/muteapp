@@ -1,4 +1,4 @@
-package com.gowtham.mute.ui
+package com.logicdraftlabs.mute.ui
 
 import android.graphics.Color as AndroidColor
 import android.os.Bundle
@@ -42,10 +42,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.gowtham.mute.R
-import com.gowtham.mute.data.PrefsManager
-import com.gowtham.mute.ui.theme.MuteTheme
-import com.gowtham.mute.ui.theme.SignalRed
+import com.logicdraftlabs.mute.R
+import com.logicdraftlabs.mute.data.PrefsManager
+import com.logicdraftlabs.mute.ui.theme.MuteTheme
+import com.logicdraftlabs.mute.ui.theme.SignalRed
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

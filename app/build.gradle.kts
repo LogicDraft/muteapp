@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.gowtham.mute"
+    namespace = "com.logicdraftlabs.mute"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.gowtham.mute"
+        applicationId = "com.logicdraftlabs.mute"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

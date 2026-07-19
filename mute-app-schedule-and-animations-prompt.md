@@ -6,9 +6,9 @@ Paste everything below into your coding agent, run from inside the `MuteApp/` pr
 
 ## The prompt
 
-replace in entire/anyever gowtham with logicdraftlabs
+replace in entire/anyever logicdraftlabs with logicdraftlabs
 
-Continue work on the MUTE. Android app (`com.gowtham.mute`). Add two things, in this order:
+Continue work on the MUTE. Android app (`com.logicdraftlabs.mute`). Add two things, in this order:
 
 ### 1. Scheduled Silence — a daily auto-mute/unmute window
 

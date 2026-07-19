@@ -1,4 +1,4 @@
-package com.gowtham.mute.tile
+package com.logicdraftlabs.mute.tile
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -7,8 +7,8 @@ import android.os.Build
 import android.provider.Settings
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import com.gowtham.mute.R
-import com.gowtham.mute.core.MuteController
+import com.logicdraftlabs.mute.R
+import com.logicdraftlabs.mute.core.MuteController
 
 /**
  * Swipe down, tap once - no app screen involved. This is the intended everyday entry point.

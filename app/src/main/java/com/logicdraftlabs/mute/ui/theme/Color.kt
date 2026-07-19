@@ -1,4 +1,4 @@
-package com.gowtham.mute.ui.theme
+package com.logicdraftlabs.mute.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

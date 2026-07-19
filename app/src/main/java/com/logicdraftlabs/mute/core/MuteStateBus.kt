@@ -1,4 +1,4 @@
-package com.gowtham.mute.core
+package com.logicdraftlabs.mute.core
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,4 +1,4 @@
-package com.gowtham.mute.data
+package com.logicdraftlabs.mute.data
 
 import android.content.Context
 import android.content.SharedPreferences

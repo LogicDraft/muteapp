@@ -73,7 +73,7 @@ MUTE. never reads contacts, location, or any personal data, and makes no network
 ## Architecture
 
 ```
-app/src/main/java/com/gowtham/mute/
+app/src/main/java/com/logicdraftlabs/mute/
 ├── core/MuteController.kt        All mute/unmute/toggle logic lives here — every entry point
 │                                  (tile, widget, notification, in-app button) calls into this
 │                                  and nothing else

@@ -1,4 +1,4 @@
-package com.gowtham.mute.ui
+package com.logicdraftlabs.mute.ui
 
 import android.Manifest
 import android.content.Intent
@@ -61,11 +61,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.gowtham.mute.R
-import com.gowtham.mute.core.MuteController
-import com.gowtham.mute.core.MuteStateBus
-import com.gowtham.mute.ui.theme.MuteTheme
-import com.gowtham.mute.ui.theme.SignalRed
+import com.logicdraftlabs.mute.R
+import com.logicdraftlabs.mute.core.MuteController
+import com.logicdraftlabs.mute.core.MuteStateBus
+import com.logicdraftlabs.mute.ui.theme.MuteTheme
+import com.logicdraftlabs.mute.ui.theme.SignalRed
 
 class MainActivity : ComponentActivity() {
 

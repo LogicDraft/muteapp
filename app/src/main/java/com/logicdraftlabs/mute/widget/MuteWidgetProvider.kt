@@ -1,4 +1,4 @@
-package com.gowtham.mute.widget
+package com.logicdraftlabs.mute.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -7,10 +7,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.gowtham.mute.R
-import com.gowtham.mute.core.MuteController
-import com.gowtham.mute.data.PrefsManager
-import com.gowtham.mute.receiver.ToggleReceiver
+import com.logicdraftlabs.mute.R
+import com.logicdraftlabs.mute.core.MuteController
+import com.logicdraftlabs.mute.data.PrefsManager
+import com.logicdraftlabs.mute.receiver.ToggleReceiver
 
 class MuteWidgetProvider : AppWidgetProvider() {
 

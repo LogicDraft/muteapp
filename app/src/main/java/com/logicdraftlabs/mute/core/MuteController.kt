@@ -1,4 +1,4 @@
-package com.gowtham.mute.core
+package com.logicdraftlabs.mute.core
 
 import android.app.AlarmManager
 import android.app.NotificationManager
@@ -12,12 +12,12 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.service.quicksettings.TileService
-import com.gowtham.mute.data.PrefsManager
-import com.gowtham.mute.notification.MuteNotificationHelper
-import com.gowtham.mute.receiver.AutoRestoreReceiver
-import com.gowtham.mute.tile.MuteTileService
-import com.gowtham.mute.ui.MainActivity
-import com.gowtham.mute.widget.MuteWidgetProvider
+import com.logicdraftlabs.mute.data.PrefsManager
+import com.logicdraftlabs.mute.notification.MuteNotificationHelper
+import com.logicdraftlabs.mute.receiver.AutoRestoreReceiver
+import com.logicdraftlabs.mute.tile.MuteTileService
+import com.logicdraftlabs.mute.ui.MainActivity
+import com.logicdraftlabs.mute.widget.MuteWidgetProvider
 
 /**
  * The whole app is this one toggle. Every entry point - QS tile, widget, notification action,
