@@ -67,4 +67,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.animation)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
 }
+

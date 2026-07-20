@@ -35,6 +35,7 @@ object PrefsManager {
     private const val KEY_SETTING_SCHEDULE_ENABLED = "schedule_enabled"
     private const val KEY_SETTING_SCHEDULE_START = "schedule_start_minutes"
     private const val KEY_SETTING_SCHEDULE_END = "schedule_end_minutes"
+    private const val KEY_SETTING_DYNAMIC_COLOR = "setting_dynamic_color"
 
     enum class DndLevel { TOTAL_SILENCE, PRIORITY_ONLY }
     enum class MuteSource { NONE, MANUAL, SCHEDULED }
@@ -150,5 +151,13 @@ object PrefsManager {
 
     fun setShowPersistentNotification(context: Context, show: Boolean) {
         prefs(context).edit().putBoolean(KEY_SETTING_PERSISTENT_NOTIFICATION, show).apply()
+    }
+
+    /** Dynamic color (Material You) — off by default; only effective on API 31+. */
+    fun getDynamicColor(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_SETTING_DYNAMIC_COLOR, false)
+
+    fun setDynamicColor(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean(KEY_SETTING_DYNAMIC_COLOR, enabled).apply()
     }
 }

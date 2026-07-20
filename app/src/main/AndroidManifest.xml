@@ -36,6 +36,30 @@
             android:label="@string/settings_title"
             android:theme="@style/Theme.Mute" />
 
+        <activity
+            android:name=".ui.DndSettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_dnd_title"
+            android:theme="@style/Theme.Mute" />
+
+        <activity
+            android:name=".ui.NotificationsSettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_notifications_title"
+            android:theme="@style/Theme.Mute" />
+
+        <activity
+            android:name=".ui.LookAndFeelActivity"
+            android:exported="false"
+            android:label="@string/settings_look_feel_title"
+            android:theme="@style/Theme.Mute" />
+
+        <activity
+            android:name=".ui.AboutActivity"
+            android:exported="false"
+            android:label="@string/settings_about_title"
+            android:theme="@style/Theme.Mute" />
+
         <!-- Quick Settings tile: the primary, no-app-UI entry point. -->
         <service
             android:name=".tile.MuteTileService"
@@ -96,6 +120,18 @@
 
         <!-- Daily scheduled silence start/end alarms. -->
         <receiver android:name=".receiver.ScheduleReceiver" android:exported="false" />
+
+        <!-- Jetpack Glance widget: Material You / dynamic-color aware 1x1 home-screen widget. -->
+        <receiver
+            android:name=".widget.MuteGlanceWidgetReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_mute_glance_info" />
+        </receiver>
     </application>
 
 </manifest>

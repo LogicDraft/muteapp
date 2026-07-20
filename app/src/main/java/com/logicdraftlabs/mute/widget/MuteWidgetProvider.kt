@@ -13,6 +13,9 @@ import com.logicdraftlabs.mute.R
 import com.logicdraftlabs.mute.core.MuteController
 import com.logicdraftlabs.mute.data.PrefsManager
 import com.logicdraftlabs.mute.receiver.ToggleReceiver
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import androidx.glance.appwidget.updateAll
 
 class MuteWidgetProvider : AppWidgetProvider() {
 
@@ -30,6 +33,7 @@ class MuteWidgetProvider : AppWidgetProvider() {
         /**
          * Called directly by MuteController right after a mute/unmute, so widgets reflect the
          * new state immediately rather than waiting for the system's next update cycle.
+         * This updates both the classic RemoteViews widgets and the Glance widget.
          */
         fun updateAllWidgets(context: Context) {
             MuteWidgetViews.updateProvider(
@@ -42,6 +46,10 @@ class MuteWidgetProvider : AppWidgetProvider() {
                 provider = MuteWideWidgetProvider::class.java,
                 buildViews = MuteWidgetViews::buildWide
             )
+            // Also update the Glance widget so it reflects the new mute state immediately.
+            MainScope().launch {
+                updateAll<MuteGlanceWidget>(context)
+            }
         }
     }
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AppWidget provider metadata for the Jetpack Glance widget (MuteGlanceWidget).
+
+    Glance generates its own RemoteViews internally; we point initialLayout to
+    the existing widget_mute layout as a fallback during first-draw. The
+    previewLayout uses the same layout — Glance doesn't require a separate
+    Compose-rendered preview; the layout XML is sufficient for the picker.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="40dp"
+    android:minHeight="40dp"
+    android:targetCellWidth="1"
+    android:targetCellHeight="1"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/widget_mute"
+    android:previewLayout="@layout/widget_mute"
+    android:previewImage="@drawable/widget_bg_active"
+    android:resizeMode="none"
+    android:widgetCategory="home_screen"
+    android:description="@string/app_name" />

@@ -62,7 +62,30 @@
     <string name="setting_developer_tagline">The developer who wants to turn every logic into pixels.</string>
     <string name="setting_developer_email">Email · logicdraftlabs@gmail.com</string>
     <string name="setting_developer_github">GitHub · github.com/LogicDraft</string>
+
+    <!-- Settings Hub -->
+    <string name="settings_hub_tagline">Tune your silence.</string>
+    <string name="settings_dnd_title">Do Not Disturb</string>
+    <string name="settings_dnd_subtitle">Alarm exclusion, DND level, auto-restore, schedule</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_notifications_subtitle">Persistent notification while muted</string>
+    <string name="settings_look_feel_title">Look &amp; Feel</string>
+    <string name="settings_look_feel_subtitle">Dynamic color</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_subtitle">Version info and developer contact</string>
+
+    <!-- Look &amp; Feel subscreen -->
+    <string name="setting_dynamic_color_title">Dynamic Colors</string>
+    <string name="setting_dynamic_color_desc">Automatically set the app theme according to the device wallpaper</string>
+    <string name="setting_dynamic_color_needs_s">Requires Android 12 or newer</string>
+
+    <!-- About subscreen -->
+    <string name="about_version_title">Version 1.0</string>
+    <string name="about_version_desc">One-tap silence for Android</string>
+    <string name="about_email">E-mail</string>
+    <string name="about_github">GitHub</string>
 </resources>
+
 
 
 
