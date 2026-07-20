@@ -14,6 +14,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
@@ -46,6 +49,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -228,6 +232,9 @@ private fun ToggleDial(isMuted: Boolean, onTap: () -> Unit) {
     val reducedMotion = rememberReducedMotion()
     val activeRingColor = MaterialTheme.colorScheme.onBackground
     val transition = updateTransition(targetState = isMuted, label = "dial_transition")
+    val breathingAlpha = if (isMuted && !reducedMotion) {
+        rememberInfiniteTransition(label = "muted_breath").animateFloat(0.78f, 1f, infiniteRepeatable(tween(1800), RepeatMode.Reverse), label = "breathing_alpha").value
+    } else 1f
     val springSpec = spring<Float>(
         dampingRatio = Spring.DampingRatioMediumBouncy,
         stiffness = Spring.StiffnessLow
@@ -235,7 +242,7 @@ private fun ToggleDial(isMuted: Boolean, onTap: () -> Unit) {
     val ringColor by transition.animateColor(
         transitionSpec = { if (reducedMotion) snap() else spring(stiffness = Spring.StiffnessMediumLow) },
         label = "dial_ring_color"
-    ) { muted -> if (muted) SignalRed else activeRingColor }
+    ) { muted -> if (muted) SignalRed.copy(alpha = breathingAlpha) else activeRingColor }
     val fillColor by transition.animateColor(
         transitionSpec = { if (reducedMotion) snap() else spring(stiffness = Spring.StiffnessMediumLow) },
         label = "dial_fill_color"
@@ -244,7 +251,7 @@ private fun ToggleDial(isMuted: Boolean, onTap: () -> Unit) {
         transitionSpec = { if (reducedMotion) snap() else springSpec },
         label = "dial_scale"
     ) { muted -> if (muted) 1.04f else 1f }
-    val actionLabel = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active)
+    val actionLabel = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active)'
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(

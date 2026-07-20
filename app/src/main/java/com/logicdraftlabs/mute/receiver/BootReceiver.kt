@@ -15,6 +15,7 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
         MuteController.rearmAutoRestoreIfNeeded(context)
+        com.logicdraftlabs.mute.core.ScheduleManager.reschedule(context)
         MuteWidgetProvider.updateAllWidgets(context)
     }
 }

@@ -19,6 +19,7 @@ object PrefsManager {
     private const val PREFS_NAME = "mute_prefs"
 
     private const val KEY_MUTED_BY_APP = "muted_by_app"
+    private const val KEY_MUTE_SOURCE = "mute_source"
     private const val KEY_SAVED_ALARM_VOL = "saved_alarm_vol"
     private const val KEY_SAVED_MEDIA_VOL = "saved_media_vol"
     private const val KEY_SAVED_NOTIF_VOL = "saved_notif_vol"
@@ -31,8 +32,12 @@ object PrefsManager {
     private const val KEY_SETTING_DND_LEVEL = "setting_dnd_level"
     private const val KEY_SETTING_AUTO_RESTORE_HOURS = "setting_auto_restore_hours"
     private const val KEY_SETTING_PERSISTENT_NOTIFICATION = "setting_persistent_notification"
+    private const val KEY_SETTING_SCHEDULE_ENABLED = "schedule_enabled"
+    private const val KEY_SETTING_SCHEDULE_START = "schedule_start_minutes"
+    private const val KEY_SETTING_SCHEDULE_END = "schedule_end_minutes"
 
     enum class DndLevel { TOTAL_SILENCE, PRIORITY_ONLY }
+    enum class MuteSource { NONE, MANUAL, SCHEDULED }
 
     /** Snapshot of everything we zero out, taken right before muting. */
     data class SavedAudioState(
@@ -54,7 +59,23 @@ object PrefsManager {
 
     fun setMutedByApp(context: Context, muted: Boolean) {
         prefs(context).edit().putBoolean(KEY_MUTED_BY_APP, muted).apply()
+        if (!muted) setMuteSource(context, MuteSource.NONE)
     }
+
+    fun getMuteSource(context: Context): MuteSource = runCatching {
+        MuteSource.valueOf(prefs(context).getString(KEY_MUTE_SOURCE, MuteSource.MANUAL.name) ?: MuteSource.MANUAL.name)
+    }.getOrDefault(MuteSource.MANUAL)
+
+    fun setMuteSource(context: Context, source: MuteSource) {
+        prefs(context).edit().putString(KEY_MUTE_SOURCE, source.name).apply()
+    }
+
+    fun isScheduleEnabled(context: Context) = prefs(context).getBoolean(KEY_SETTING_SCHEDULE_ENABLED, false)
+    fun setScheduleEnabled(context: Context, enabled: Boolean) = prefs(context).edit().putBoolean(KEY_SETTING_SCHEDULE_ENABLED, enabled).apply()
+    fun getScheduleStartMinutes(context: Context) = prefs(context).getInt(KEY_SETTING_SCHEDULE_START, 22 * 60)
+    fun setScheduleStartMinutes(context: Context, minutes: Int) = prefs(context).edit().putInt(KEY_SETTING_SCHEDULE_START, minutes).apply()
+    fun getScheduleEndMinutes(context: Context) = prefs(context).getInt(KEY_SETTING_SCHEDULE_END, 7 * 60)
+    fun setScheduleEndMinutes(context: Context, minutes: Int) = prefs(context).edit().putInt(KEY_SETTING_SCHEDULE_END, minutes).apply()
 
     // --- Saved audio snapshot ---------------------------------------------------------------
 

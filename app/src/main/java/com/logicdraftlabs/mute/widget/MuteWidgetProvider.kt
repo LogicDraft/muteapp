@@ -7,6 +7,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
+import android.text.format.DateFormat
+import java.util.Calendar
 import com.logicdraftlabs.mute.R
 import com.logicdraftlabs.mute.core.MuteController
 import com.logicdraftlabs.mute.data.PrefsManager
@@ -125,6 +127,11 @@ private object MuteWidgetViews {
 
     private fun wideStatus(context: Context, muted: Boolean): String {
         if (!muted) return context.getString(R.string.widget_status_active)
+        if (PrefsManager.getMuteSource(context) == PrefsManager.MuteSource.SCHEDULED && PrefsManager.isScheduleEnabled(context)) {
+            val minutes = PrefsManager.getScheduleEndMinutes(context)
+            val c = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, minutes / 60); set(Calendar.MINUTE, minutes % 60) }
+            return context.getString(R.string.tile_label_scheduled, DateFormat.getTimeFormat(context).format(c.time))
+        }
 
         val restoreAt = PrefsManager.getAutoRestoreAt(context)
         val remaining = restoreAt?.minus(System.currentTimeMillis()) ?: 0L
@@ -159,3 +166,4 @@ private object MuteWidgetViews {
         )
     }
 }
+

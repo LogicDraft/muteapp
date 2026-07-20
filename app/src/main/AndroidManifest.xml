@@ -94,6 +94,8 @@
             android:name=".receiver.AutoRestoreReceiver"
             android:exported="false" />
 
+        <!-- Daily scheduled silence start/end alarms. -->
+        <receiver android:name=".receiver.ScheduleReceiver" android:exported="false" />
     </application>
 
 </manifest>

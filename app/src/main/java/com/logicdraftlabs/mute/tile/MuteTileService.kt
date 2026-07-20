@@ -5,6 +5,9 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.provider.Settings
+import android.text.format.DateFormat
+import java.util.Calendar
+import com.logicdraftlabs.mute.data.PrefsManager
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.logicdraftlabs.mute.R
@@ -43,7 +46,7 @@ class MuteTileService : TileService() {
 
         val visual = when {
             !granted -> TileVisual(Tile.STATE_INACTIVE, R.drawable.ic_tile_muted, getString(R.string.tile_label_permission))
-            muted -> TileVisual(Tile.STATE_ACTIVE, R.drawable.ic_tile_muted, getString(R.string.tile_label_muted))
+            muted -> TileVisual(Tile.STATE_ACTIVE, R.drawable.ic_tile_muted, scheduledSubtitle())
             else -> TileVisual(Tile.STATE_INACTIVE, R.drawable.ic_tile_active, getString(R.string.tile_label_active))
         }
 
@@ -57,6 +60,13 @@ class MuteTileService : TileService() {
             tile.label = visual.statusText
         }
         tile.updateTile()
+    }
+
+    private fun scheduledSubtitle(): String {
+        if (PrefsManager.getMuteSource(this) != PrefsManager.MuteSource.SCHEDULED) return getString(R.string.tile_label_muted)
+        val minutes = PrefsManager.getScheduleEndMinutes(this)
+        val c = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, minutes / 60); set(Calendar.MINUTE, minutes % 60) }
+        return getString(R.string.tile_label_scheduled, DateFormat.getTimeFormat(this).format(c.time))
     }
 
     private fun openPermissionSettings() {
@@ -74,3 +84,7 @@ class MuteTileService : TileService() {
         }
     }
 }
+
+
+
+

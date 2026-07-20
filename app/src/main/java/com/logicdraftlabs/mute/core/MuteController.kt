@@ -15,6 +15,7 @@ import android.service.quicksettings.TileService
 import com.logicdraftlabs.mute.data.PrefsManager
 import com.logicdraftlabs.mute.notification.MuteNotificationHelper
 import com.logicdraftlabs.mute.receiver.AutoRestoreReceiver
+import com.logicdraftlabs.mute.data.PrefsManager.MuteSource
 import com.logicdraftlabs.mute.tile.MuteTileService
 import com.logicdraftlabs.mute.ui.MainActivity
 import com.logicdraftlabs.mute.widget.MuteWidgetProvider
@@ -48,15 +49,15 @@ object MuteController {
             return isMuted(app)
         }
         return if (isMuted(app)) {
-            unmute(app)
+            unmute(app, MuteSource.MANUAL)
             false
         } else {
-            mute(app)
+            mute(app, MuteSource.MANUAL)
             true
         }
     }
 
-    fun mute(context: Context) {
+    fun mute(context: Context, source: MuteSource = MuteSource.MANUAL) {
         val app = context.applicationContext
         val audioManager = app.getSystemService(AudioManager::class.java) ?: return
         val notificationManager = app.getSystemService(NotificationManager::class.java) ?: return
@@ -88,6 +89,7 @@ object MuteController {
         }
         runCatching { notificationManager.setInterruptionFilter(filter) }
 
+        PrefsManager.setMuteSource(app, source)
         PrefsManager.setMutedByApp(app, true)
         scheduleAutoRestore(app)
         if (PrefsManager.getShowPersistentNotification(app)) {
@@ -97,7 +99,7 @@ object MuteController {
         refreshSurfaces(app)
     }
 
-    fun unmute(context: Context) {
+    fun unmute(context: Context, source: MuteSource = MuteSource.MANUAL) {
         val app = context.applicationContext
         val audioManager = app.getSystemService(AudioManager::class.java) ?: return
         val notificationManager = app.getSystemService(NotificationManager::class.java) ?: return
@@ -206,3 +208,4 @@ object MuteController {
         MuteStateBus.notifyChanged()
     }
 }
+

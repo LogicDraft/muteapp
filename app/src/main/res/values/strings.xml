@@ -7,7 +7,7 @@
     <string name="hint_muted">Tap to restore sound</string>
     <string name="hint_active">Tap to go silent</string>
     <string name="permission_title">One-time setup</string>
-    <string name="permission_body">MUTE. needs Do Not Disturb access to control ringer, media, and call sounds in one tap. This isn\'t a normal permission dialog — Android opens a system settings screen for it.</string>
+    <string name="permission_body">MUTE. needs Do Not Disturb access to control ringer, media, and call sounds in one tap. This isn\'t a normal permission dialog Ã¢â‚¬â€ Android opens a system settings screen for it.</string>
     <string name="permission_grant">Grant Do Not Disturb access</string>
     <string name="permission_missing_short">DND access needed</string>
     <string name="settings_link">Settings</string>
@@ -15,6 +15,7 @@
 
     <!-- Quick Settings tile -->
     <string name="tile_label_muted">Muted</string>
+    <string name="tile_label_scheduled">Muted Â· until %1$s</string>
     <string name="tile_label_active">Unmuted</string>
     <string name="tile_label_permission">Tap to allow</string>
 
@@ -46,4 +47,24 @@
     <string name="setting_auto_restore_off">Off</string>
     <string name="setting_notification_title">Persistent notification</string>
     <string name="setting_notification_desc">Show a low-priority \"Silent mode on\" notification while muted</string>
+    <string name="setting_schedule_title">Scheduled Silence</string>
+    <string name="setting_schedule_enabled">Enable daily schedule</string>
+    <string name="setting_schedule_daily">Mute automatically between these times every day</string>
+    <string name="setting_schedule_desc">Configured but off</string>
+    <string name="setting_schedule_configured">Schedule is on, waiting for the next window</string>
+    <string name="setting_schedule_active">Schedule is active now Â· scheduled mute owns the state</string>
+    <string name="setting_schedule_start">Start Â· %1$s</string>
+    <string name="setting_schedule_end">End Â· %1$s</string>
+    <string name="setting_schedule_pick_time">Choose time</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="setting_developer_title">Developer</string>
+    <string name="setting_developer_tagline">The developer who wants to turn every logic into pixels.</string>
+    <string name="setting_developer_email">Email · logicdraftlabs@gmail.com</string>
+    <string name="setting_developer_github">GitHub · github.com/LogicDraft</string>
 </resources>
+
+
+
+
+
