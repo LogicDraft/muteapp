@@ -39,6 +39,9 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -64,7 +67,7 @@ import com.logicdraftlabs.mute.R
 import com.logicdraftlabs.mute.core.ScheduleManager
 import com.logicdraftlabs.mute.data.PrefsManager
 import com.logicdraftlabs.mute.ui.theme.MuteTheme
-import com.logicdraftlabs.mute.ui.theme.SignalRed
+
 import java.text.DateFormat
 import java.util.Calendar
 
@@ -124,7 +127,7 @@ private fun DndSettingsScreen(onBack: () -> Unit) {
             SettingsCard {
                 ListItem(
                     leadingContent = {
-                        Icon(Icons.Default.Alarm, contentDescription = null, tint = SignalRed, modifier = Modifier.size(24.dp))
+                        Icon(Icons.Default.Alarm, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
                     },
                     headlineContent = {
                         Text(stringResource(R.string.setting_exclude_alarm_title), style = MaterialTheme.typography.titleMedium)
@@ -136,7 +139,7 @@ private fun DndSettingsScreen(onBack: () -> Unit) {
                         Switch(
                             checked = excludeAlarm,
                             onCheckedChange = { excludeAlarm = it; PrefsManager.setExcludeAlarm(context, it) },
-                            colors = SwitchDefaults.colors(checkedThumbColor = SignalRed, checkedTrackColor = SignalRed.copy(alpha = 0.35f))
+                            colors = SwitchDefaults.colors(checkedThumbColor = MaterialTheme.colorScheme.primary, checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f))
                         )
                     },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
@@ -147,26 +150,28 @@ private fun DndSettingsScreen(onBack: () -> Unit) {
             SettingsCard {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 6.dp)) {
-                        Icon(Icons.Default.VolumeOff, contentDescription = null, tint = SignalRed, modifier = Modifier.size(24.dp).padding(end = 0.dp))
+                        Icon(Icons.Default.VolumeOff, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp).padding(end = 0.dp))
                         Text(
                             stringResource(R.string.setting_dnd_level_title),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(start = 12.dp)
                         )
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                        ChoiceChip(
-                            label = stringResource(R.string.setting_dnd_total_silence),
-                            isSelected = dndLevel == PrefsManager.DndLevel.TOTAL_SILENCE,
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        SegmentedButton(
+                            selected = dndLevel == PrefsManager.DndLevel.TOTAL_SILENCE,
                             onClick = { dndLevel = PrefsManager.DndLevel.TOTAL_SILENCE; PrefsManager.setDndLevel(context, PrefsManager.DndLevel.TOTAL_SILENCE) },
-                            modifier = Modifier.weight(1f)
-                        )
-                        ChoiceChip(
-                            label = stringResource(R.string.setting_dnd_priority),
-                            isSelected = dndLevel == PrefsManager.DndLevel.PRIORITY_ONLY,
+                            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+                        ) {
+                            Text(stringResource(R.string.setting_dnd_total_silence))
+                        }
+                        SegmentedButton(
+                            selected = dndLevel == PrefsManager.DndLevel.PRIORITY_ONLY,
                             onClick = { dndLevel = PrefsManager.DndLevel.PRIORITY_ONLY; PrefsManager.setDndLevel(context, PrefsManager.DndLevel.PRIORITY_ONLY) },
-                            modifier = Modifier.weight(1f)
-                        )
+                            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+                        ) {
+                            Text(stringResource(R.string.setting_dnd_priority))
+                        }
                     }
                     Text(
                         text = if (dndLevel == PrefsManager.DndLevel.TOTAL_SILENCE)
@@ -183,18 +188,19 @@ private fun DndSettingsScreen(onBack: () -> Unit) {
             SettingsCard {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                        Icon(Icons.Default.Timer, contentDescription = null, tint = SignalRed, modifier = Modifier.size(24.dp))
+                        Icon(Icons.Default.Timer, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
                         Text(stringResource(R.string.setting_auto_restore_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = 12.dp))
                     }
                     Text(stringResource(R.string.setting_auto_restore_desc), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 10.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        autoRestoreOptions.forEach { h ->
-                            ChoiceChip(
-                                label = if (h == 0) stringResource(R.string.setting_auto_restore_off) else "${h}h",
-                                isSelected = autoRestoreHours == h,
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        autoRestoreOptions.forEachIndexed { index, h ->
+                            SegmentedButton(
+                                selected = autoRestoreHours == h,
                                 onClick = { autoRestoreHours = h; PrefsManager.setAutoRestoreHours(context, h) },
-                                modifier = Modifier.weight(1f)
-                            )
+                                shape = SegmentedButtonDefaults.itemShape(index = index, count = autoRestoreOptions.size)
+                            ) {
+                                Text(if (h == 0) stringResource(R.string.setting_auto_restore_off) else "${h}h")
+                            }
                         }
                     }
                 }
@@ -213,29 +219,5 @@ private fun SettingsCard(content: @Composable () -> Unit) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         content()
-    }
-}
-
-@Composable
-private fun ChoiceChip(label: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    val borderColor = if (isSelected) SignalRed else MaterialTheme.colorScheme.outline
-    Surface(
-        modifier = modifier
-            .height(48.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        color = if (isSelected) SignalRed.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
-    ) {
-        Text(
-            label,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) SignalRed else MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp)
-        )
     }
 }

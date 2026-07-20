@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,13 +53,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.logicdraftlabs.mute.R
 import com.logicdraftlabs.mute.ui.theme.MuteTheme
-import com.logicdraftlabs.mute.ui.theme.SignalRed
+
 
 class AboutActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,7 +114,7 @@ private fun AboutScreen(onBack: () -> Unit) {
             Text(
                 text = stringResource(R.string.settings_about_title),
                 style = MaterialTheme.typography.labelLarge,
-                color = SignalRed,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
             )
 
@@ -126,7 +129,7 @@ private fun AboutScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.Default.Info,
                             contentDescription = null,
-                            tint = SignalRed,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                     },
@@ -146,8 +149,18 @@ private fun AboutScreen(onBack: () -> Unit) {
             Text(
                 text = stringResource(R.string.setting_developer_title),
                 style = MaterialTheme.typography.labelLarge,
-                color = SignalRed,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
+            )
+            
+            Image(
+                painter = painterResource(id = R.drawable.logicdraftlabs),
+                contentDescription = "LogicDraft Labs Logo",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .padding(vertical = 4.dp),
+                contentScale = ContentScale.Fit
             )
 
             // Developer tagline

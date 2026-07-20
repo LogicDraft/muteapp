@@ -70,7 +70,7 @@ import com.logicdraftlabs.mute.R
 import com.logicdraftlabs.mute.core.MuteController
 import com.logicdraftlabs.mute.core.MuteStateBus
 import com.logicdraftlabs.mute.ui.theme.MuteTheme
-import com.logicdraftlabs.mute.ui.theme.SignalRed
+
 
 class MainActivity : ComponentActivity() {
 
@@ -100,6 +100,20 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScreen(refreshTick: Int) {
     val context = LocalContext.current
@@ -114,7 +128,7 @@ private fun MainScreen(refreshTick: Int) {
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { /* no-op either way - the persistent notification is a nice-to-have, not required */ }
+    ) { /* no-op */ }
 
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -127,30 +141,28 @@ private fun MainScreen(refreshTick: Int) {
         }
     }
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.safeDrawing),
-        color = MaterialTheme.colorScheme.background
-    ) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold) },
+                actions = {
+                    IconButton(onClick = { context.startActivity(Intent(context, SettingsActivity::class.java)) }) {
+                        Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.settings_link))
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
+            )
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 28.dp),
+                .padding(paddingValues)
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(
-                modifier = Modifier.padding(top = 40.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-
             if (!isGranted) {
                 PermissionPrompt(
                     onGrant = {
@@ -160,7 +172,7 @@ private fun MainScreen(refreshTick: Int) {
                     }
                 )
             } else {
-                ToggleDial(
+                ToggleButton(
                     isMuted = isMuted,
                     onTap = {
                         isMuted = MuteController.toggle(context)
@@ -168,27 +180,13 @@ private fun MainScreen(refreshTick: Int) {
                 )
             }
 
-            Column(
-                modifier = Modifier.padding(bottom = 36.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                StatusHintText(
-                    context = context,
-                    isMuted = isMuted,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp)
-                )
-                Text(
-                    text = stringResource(R.string.settings_link),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-                        .clickable {
-                            context.startActivity(Intent(context, SettingsActivity::class.java))
-                        }
-                        .padding(12.dp)
-                )
-            }
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            StatusHintText(
+                context = context,
+                isMuted = isMuted,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
         }
     }
 }
@@ -211,83 +209,58 @@ private fun PermissionPrompt(onGrant: () -> Unit) {
         )
         Button(
             onClick = onGrant,
-            modifier = Modifier.heightIn(min = 48.dp),
-            shape = RoundedCornerShape(2.dp),
+            modifier = Modifier.fillMaxWidth().height(80.dp),
+            shape = RoundedCornerShape(24.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = SignalRed,
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
             Text(
                 text = stringResource(R.string.permission_grant),
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
         }
     }
 }
 
 @Composable
-private fun ToggleDial(isMuted: Boolean, onTap: () -> Unit) {
+private fun ToggleButton(isMuted: Boolean, onTap: () -> Unit) {
     val reducedMotion = rememberReducedMotion()
-    val activeRingColor = MaterialTheme.colorScheme.onBackground
     val transition = updateTransition(targetState = isMuted, label = "dial_transition")
-    val breathingAlpha = if (isMuted && !reducedMotion) {
-        rememberInfiniteTransition(label = "muted_breath").animateFloat(0.78f, 1f, infiniteRepeatable(tween(1800), RepeatMode.Reverse), label = "breathing_alpha").value
-    } else 1f
-    val springSpec = spring<Float>(
-        dampingRatio = Spring.DampingRatioMediumBouncy,
-        stiffness = Spring.StiffnessLow
-    )
-    val ringColor by transition.animateColor(
-        transitionSpec = { if (reducedMotion) snap() else spring(stiffness = Spring.StiffnessMediumLow) },
-        label = "dial_ring_color"
-    ) { muted -> if (muted) SignalRed.copy(alpha = breathingAlpha) else activeRingColor }
-    val fillColor by transition.animateColor(
-        transitionSpec = { if (reducedMotion) snap() else spring(stiffness = Spring.StiffnessMediumLow) },
-        label = "dial_fill_color"
-    ) { muted -> if (muted) SignalRed.copy(alpha = 0.10f) else Color.Transparent }
-    val dialScale by transition.animateFloat(
-        transitionSpec = { if (reducedMotion) snap() else springSpec },
-        label = "dial_scale"
-    ) { muted -> if (muted) 1.04f else 1f }
+    
+    val containerColor by transition.animateColor(
+        transitionSpec = { if (reducedMotion) snap() else tween(300) },
+        label = "dial_container_color"
+    ) { muted -> 
+        if (muted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant 
+    }
+    
+    val contentColor by transition.animateColor(
+        transitionSpec = { if (reducedMotion) snap() else tween(300) },
+        label = "dial_content_color"
+    ) { muted -> 
+        if (muted) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant 
+    }
+    
     val actionLabel = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active)
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            modifier = Modifier
-                .size(190.dp)
-                .graphicsLayer {
-                    scaleX = dialScale
-                    scaleY = dialScale
-                }
-                .border(width = 1.5.dp, color = ringColor, shape = CircleShape)
-                .padding(14.dp)
-                .background(
-                    color = fillColor,
-                    shape = CircleShape
-                )
-                .semantics {
-                    contentDescription = actionLabel
-                }
-                .clickable(
-                    onClickLabel = actionLabel,
-                    role = Role.Button,
-                    onClick = onTap
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = if (isMuted) stringResource(R.string.status_muted) else stringResource(R.string.status_active),
-                style = MaterialTheme.typography.labelLarge,
-                color = ringColor,
-                fontWeight = FontWeight.Bold
-            )
-        }
+    Button(
+        onClick = onTap,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor
+        )
+    ) {
         Text(
-            text = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 18.dp)
+            text = if (isMuted) stringResource(R.string.status_muted) else stringResource(R.string.status_active),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.ExtraBold
         )
     }
 }

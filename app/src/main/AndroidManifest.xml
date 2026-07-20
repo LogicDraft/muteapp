@@ -48,16 +48,17 @@
             android:label="@string/settings_notifications_title"
             android:theme="@style/Theme.Mute" />
 
-        <activity
-            android:name=".ui.LookAndFeelActivity"
-            android:exported="false"
-            android:label="@string/settings_look_feel_title"
-            android:theme="@style/Theme.Mute" />
 
         <activity
             android:name=".ui.AboutActivity"
             android:exported="false"
             android:label="@string/settings_about_title"
+            android:theme="@style/Theme.Mute" />
+
+        <activity
+            android:name=".ui.LookAndFeelActivity"
+            android:exported="false"
+            android:label="@string/settings_look_feel_title"
             android:theme="@style/Theme.Mute" />
 
         <!-- Quick Settings tile: the primary, no-app-UI entry point. -->

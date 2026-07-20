@@ -29,7 +29,7 @@ import com.logicdraftlabs.mute.core.ScheduleManager
 import com.logicdraftlabs.mute.data.PrefsManager
 import com.logicdraftlabs.mute.data.Schedule
 import com.logicdraftlabs.mute.ui.theme.MuteTheme
-import com.logicdraftlabs.mute.ui.theme.SignalRed
+
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import java.time.LocalTime
@@ -110,7 +110,7 @@ private fun SchedulesScreen() {
                 onClick = {
                     editLauncher.launch(Intent(context, ScheduleEditActivity::class.java))
                 },
-                containerColor = SignalRed,
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = androidx.compose.ui.graphics.Color.White
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.schedule_add))
@@ -210,8 +210,8 @@ private fun ScheduleCard(
                 checked = schedule.enabled,
                 onCheckedChange = onToggle,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = SignalRed,
-                    checkedTrackColor = SignalRed.copy(alpha = 0.3f)
+                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                 )
             )
         }

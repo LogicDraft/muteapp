@@ -75,6 +75,13 @@
     <string name="settings_about_subtitle">Version info and developer contact</string>
 
     <!-- Look &amp; Feel subscreen -->
+    <string name="look_and_feel">Look &amp; Feel</string>
+    <string name="system_default">System default</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="dynamic_colors">Dynamic colors</string>
+    <string name="dynamic_colors_desc">Automatically set the app theme according to the device wallpaper (Android 12+)</string>
     <string name="setting_dynamic_color_title">Dynamic Colors</string>
     <string name="setting_dynamic_color_desc">Automatically set the app theme according to the device wallpaper</string>
     <string name="setting_dynamic_color_needs_s">Requires Android 12 or newer</string>

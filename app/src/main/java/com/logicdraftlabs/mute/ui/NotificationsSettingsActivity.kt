@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.logicdraftlabs.mute.R
 import com.logicdraftlabs.mute.data.PrefsManager
 import com.logicdraftlabs.mute.ui.theme.MuteTheme
-import com.logicdraftlabs.mute.ui.theme.SignalRed
+
 
 class NotificationsSettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -104,7 +104,7 @@ private fun NotificationsSettingsScreen(onBack: () -> Unit) {
                         Icon(
                             Icons.Default.Notifications,
                             contentDescription = null,
-                            tint = SignalRed,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
                     },
@@ -129,8 +129,8 @@ private fun NotificationsSettingsScreen(onBack: () -> Unit) {
                                 PrefsManager.setShowPersistentNotification(context, it)
                             },
                             colors = SwitchDefaults.colors(
-                                checkedThumbColor = SignalRed,
-                                checkedTrackColor = SignalRed.copy(alpha = 0.35f)
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
                             )
                         )
                     },

@@ -65,7 +65,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.logicdraftlabs.mute.R
 import com.logicdraftlabs.mute.ui.theme.MuteTheme
-import com.logicdraftlabs.mute.ui.theme.SignalRed
+
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,7 +117,7 @@ private fun SettingsHubScreen(onBack: () -> Unit) {
             Text(
                 text = stringResource(R.string.settings_hub_tagline),
                 style = MaterialTheme.typography.titleMedium,
-                color = SignalRed,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 28.dp)
             )
 
@@ -143,6 +143,7 @@ private fun SettingsHubScreen(onBack: () -> Unit) {
                 onClick = { context.startActivity(Intent(context, NotificationsSettingsActivity::class.java)) }
             )
             Spacer(Modifier.height(12.dp))
+
             HubCard(
                 icon = Icons.Default.Palette,
                 title = stringResource(R.string.settings_look_feel_title),
@@ -150,6 +151,7 @@ private fun SettingsHubScreen(onBack: () -> Unit) {
                 onClick = { context.startActivity(Intent(context, LookAndFeelActivity::class.java)) }
             )
             Spacer(Modifier.height(12.dp))
+
             HubCard(
                 icon = Icons.Default.Info,
                 title = stringResource(R.string.settings_about_title),
@@ -208,14 +210,14 @@ private fun AnimatedRingHeader() {
             size = 66.dp,
             strokeWidth = 1.5f.dp,
             rotation = innerAngle,
-            color = SignalRed.copy(alpha = 0.70f),
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.70f),
             dotCount = 2
         )
         // Center dot
         Surface(
             modifier = Modifier.size(10.dp),
             shape = RoundedCornerShape(50),
-            color = SignalRed
+            color = MaterialTheme.colorScheme.primary
         ) {}
     }
 }
@@ -277,7 +279,7 @@ private fun HubCard(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = SignalRed,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(26.dp)
                 )
             },

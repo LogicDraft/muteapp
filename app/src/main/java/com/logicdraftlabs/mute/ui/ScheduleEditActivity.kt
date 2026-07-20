@@ -27,7 +27,7 @@ import com.logicdraftlabs.mute.core.ScheduleManager
 import com.logicdraftlabs.mute.data.PrefsManager
 import com.logicdraftlabs.mute.data.Schedule
 import com.logicdraftlabs.mute.ui.theme.MuteTheme
-import com.logicdraftlabs.mute.ui.theme.SignalRed
+
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -179,7 +179,7 @@ private fun ScheduleEditScreen(scheduleId: String?, onFinish: (String?) -> Unit)
                                         selectedDays = newDays
                                     },
                                 shape = RoundedCornerShape(20.dp),
-                                color = if (isSelected) SignalRed else MaterialTheme.colorScheme.surfaceVariant,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
                                 contentColor = if (isSelected) androidx.compose.ui.graphics.Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
@@ -269,7 +269,7 @@ private fun ScheduleEditScreen(scheduleId: String?, onFinish: (String?) -> Unit)
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SignalRed)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text("Save", style = MaterialTheme.typography.titleMedium)
             }
@@ -382,8 +382,8 @@ private fun LevelChip(
     Surface(
         modifier = modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
-        color = if (selected) SignalRed.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface,
-        contentColor = if (selected) SignalRed else MaterialTheme.colorScheme.onSurface
+        color = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface,
+        contentColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 12.dp)) {
             Text(text = label, style = MaterialTheme.typography.labelLarge)

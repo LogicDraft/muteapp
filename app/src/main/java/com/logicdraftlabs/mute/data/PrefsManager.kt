@@ -32,7 +32,13 @@ object PrefsManager {
     private const val KEY_SETTING_DND_LEVEL = "setting_dnd_level"
     private const val KEY_SETTING_AUTO_RESTORE_HOURS = "setting_auto_restore_hours"
     private const val KEY_SETTING_PERSISTENT_NOTIFICATION = "setting_persistent_notification"
+    private const val KEY_SETTING_DYNAMIC_COLOR = "setting_dynamic_color"
+    private const val KEY_SETTING_THEME = "setting_theme"
     private const val KEY_SCHEDULES = "schedules_json"
+
+    const val THEME_SYSTEM = "system"
+    const val THEME_LIGHT = "light"
+    const val THEME_DARK = "dark"
 
     enum class DndLevel { TOTAL_SILENCE, PRIORITY_ONLY }
 
@@ -166,5 +172,19 @@ object PrefsManager {
 
     fun setShowPersistentNotification(context: Context, show: Boolean) {
         prefs(context).edit().putBoolean(KEY_SETTING_PERSISTENT_NOTIFICATION, show).apply()
+    }
+    
+    fun isDynamicColorEnabled(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_SETTING_DYNAMIC_COLOR, true)
+
+    fun setDynamicColorEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean(KEY_SETTING_DYNAMIC_COLOR, enabled).apply()
+    }
+
+    fun getThemePreference(context: Context): String =
+        prefs(context).getString(KEY_SETTING_THEME, THEME_SYSTEM) ?: THEME_SYSTEM
+
+    fun setThemePreference(context: Context, theme: String) {
+        prefs(context).edit().putString(KEY_SETTING_THEME, theme).apply()
     }
 }
