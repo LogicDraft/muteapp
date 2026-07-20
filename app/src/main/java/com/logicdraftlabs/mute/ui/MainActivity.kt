@@ -251,7 +251,7 @@ private fun ToggleDial(isMuted: Boolean, onTap: () -> Unit) {
         transitionSpec = { if (reducedMotion) snap() else springSpec },
         label = "dial_scale"
     ) { muted -> if (muted) 1.04f else 1f }
-    val actionLabel = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active)'
+    val actionLabel = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
