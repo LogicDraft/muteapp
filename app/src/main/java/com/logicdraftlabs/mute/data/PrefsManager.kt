@@ -32,13 +32,16 @@ object PrefsManager {
     private const val KEY_SETTING_DND_LEVEL = "setting_dnd_level"
     private const val KEY_SETTING_AUTO_RESTORE_HOURS = "setting_auto_restore_hours"
     private const val KEY_SETTING_PERSISTENT_NOTIFICATION = "setting_persistent_notification"
-    private const val KEY_SETTING_SCHEDULE_ENABLED = "schedule_enabled"
-    private const val KEY_SETTING_SCHEDULE_START = "schedule_start_minutes"
-    private const val KEY_SETTING_SCHEDULE_END = "schedule_end_minutes"
     private const val KEY_SETTING_DYNAMIC_COLOR = "setting_dynamic_color"
+    private const val KEY_SCHEDULES = "schedules_json"
 
     enum class DndLevel { TOTAL_SILENCE, PRIORITY_ONLY }
-    enum class MuteSource { NONE, MANUAL, SCHEDULED }
+
+    sealed class MuteSource {
+        object None : MuteSource()
+        object Manual : MuteSource()
+        data class Scheduled(val scheduleId: String) : MuteSource()
+    }
 
     /** Snapshot of everything we zero out, taken right before muting. */
     data class SavedAudioState(
@@ -60,23 +63,36 @@ object PrefsManager {
 
     fun setMutedByApp(context: Context, muted: Boolean) {
         prefs(context).edit().putBoolean(KEY_MUTED_BY_APP, muted).apply()
-        if (!muted) setMuteSource(context, MuteSource.NONE)
+        if (!muted) setMuteSource(context, MuteSource.None)
     }
 
-    fun getMuteSource(context: Context): MuteSource = runCatching {
-        MuteSource.valueOf(prefs(context).getString(KEY_MUTE_SOURCE, MuteSource.MANUAL.name) ?: MuteSource.MANUAL.name)
-    }.getOrDefault(MuteSource.MANUAL)
+    fun getMuteSource(context: Context): MuteSource {
+        val saved = prefs(context).getString(KEY_MUTE_SOURCE, "MANUAL") ?: "MANUAL"
+        return when {
+            saved == "NONE" -> MuteSource.None
+            saved.startsWith("SCHEDULED:") -> MuteSource.Scheduled(saved.removePrefix("SCHEDULED:"))
+            else -> MuteSource.Manual
+        }
+    }
 
     fun setMuteSource(context: Context, source: MuteSource) {
-        prefs(context).edit().putString(KEY_MUTE_SOURCE, source.name).apply()
+        val str = when (source) {
+            is MuteSource.None -> "NONE"
+            is MuteSource.Manual -> "MANUAL"
+            is MuteSource.Scheduled -> "SCHEDULED:${source.scheduleId}"
+        }
+        prefs(context).edit().putString(KEY_MUTE_SOURCE, str).apply()
     }
 
-    fun isScheduleEnabled(context: Context) = prefs(context).getBoolean(KEY_SETTING_SCHEDULE_ENABLED, false)
-    fun setScheduleEnabled(context: Context, enabled: Boolean) = prefs(context).edit().putBoolean(KEY_SETTING_SCHEDULE_ENABLED, enabled).apply()
-    fun getScheduleStartMinutes(context: Context) = prefs(context).getInt(KEY_SETTING_SCHEDULE_START, 22 * 60)
-    fun setScheduleStartMinutes(context: Context, minutes: Int) = prefs(context).edit().putInt(KEY_SETTING_SCHEDULE_START, minutes).apply()
-    fun getScheduleEndMinutes(context: Context) = prefs(context).getInt(KEY_SETTING_SCHEDULE_END, 7 * 60)
-    fun setScheduleEndMinutes(context: Context, minutes: Int) = prefs(context).edit().putInt(KEY_SETTING_SCHEDULE_END, minutes).apply()
+    fun getSchedules(context: Context): List<Schedule> {
+        val jsonStr = prefs(context).getString(KEY_SCHEDULES, null) ?: return emptyList()
+        return runCatching { kotlinx.serialization.json.Json.decodeFromString<List<Schedule>>(jsonStr) }.getOrDefault(emptyList())
+    }
+
+    fun saveSchedules(context: Context, schedules: List<Schedule>) {
+        val jsonStr = kotlinx.serialization.json.Json.encodeToString(kotlinx.serialization.builtins.ListSerializer(Schedule.serializer()), schedules)
+        prefs(context).edit().putString(KEY_SCHEDULES, jsonStr).apply()
+    }
 
     // --- Saved audio snapshot ---------------------------------------------------------------
 

@@ -27,6 +27,8 @@ your exact prior state, reachable without ever opening the app.
 
 - **Quick Settings tile** and a **1×1 home-screen widget** — the two intended everyday entry
   points; the app screen itself is only for one-time setup
+- **Direct mapping**: Everything is 1:1 with native system APIs (`AudioManager`, `NotificationManager`, `AlarmManager`).
+- **Standardized**: Uses Android's native Quick Settings Tile API, AppWidget framework, and Jetpack Compose.
 - **Exact restore** — the moment you mute, current alarm/media/notification/ring volumes, ringer
   mode, and DND filter are snapshotted and restored precisely, not reset to a guess
 - **Do Not Disturb integration** — choose Total Silence or Priority Only

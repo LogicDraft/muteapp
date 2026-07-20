@@ -135,10 +135,18 @@ private object MuteWidgetViews {
 
     private fun wideStatus(context: Context, muted: Boolean): String {
         if (!muted) return context.getString(R.string.widget_status_active)
-        if (PrefsManager.getMuteSource(context) == PrefsManager.MuteSource.SCHEDULED && PrefsManager.isScheduleEnabled(context)) {
-            val minutes = PrefsManager.getScheduleEndMinutes(context)
-            val c = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, minutes / 60); set(Calendar.MINUTE, minutes % 60) }
-            return context.getString(R.string.tile_label_scheduled, DateFormat.getTimeFormat(context).format(c.time))
+        val source = PrefsManager.getMuteSource(context)
+        if (source is PrefsManager.MuteSource.Scheduled) {
+            val schedules = PrefsManager.getSchedules(context).filter { it.enabled }
+            val schedule = schedules.find { it.id == source.scheduleId }
+            if (schedule != null) {
+                val now = System.currentTimeMillis()
+                val currentWindow = com.logicdraftlabs.mute.core.ScheduleManager.getNextWindows(schedule).find { now in it.start..it.end }
+                if (currentWindow != null) {
+                    val c = Calendar.getInstance().apply { timeInMillis = currentWindow.end }
+                    return context.getString(R.string.tile_label_scheduled, DateFormat.getTimeFormat(context).format(c.time))
+                }
+            }
         }
 
         val restoreAt = PrefsManager.getAutoRestoreAt(context)

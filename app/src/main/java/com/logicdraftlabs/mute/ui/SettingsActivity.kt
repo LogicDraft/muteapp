@@ -36,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -126,6 +127,13 @@ private fun SettingsHubScreen(onBack: () -> Unit) {
                 title = stringResource(R.string.settings_dnd_title),
                 subtitle = stringResource(R.string.settings_dnd_subtitle),
                 onClick = { context.startActivity(Intent(context, DndSettingsActivity::class.java)) }
+            )
+            Spacer(Modifier.height(12.dp))
+            HubCard(
+                icon = Icons.Default.Schedule,
+                title = stringResource(R.string.schedules_title),
+                subtitle = stringResource(R.string.schedules_subtitle),
+                onClick = { context.startActivity(Intent(context, SchedulesActivity::class.java)) }
             )
             Spacer(Modifier.height(12.dp))
             HubCard(

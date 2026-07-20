@@ -49,15 +49,19 @@ object MuteController {
             return isMuted(app)
         }
         return if (isMuted(app)) {
-            unmute(app, MuteSource.MANUAL)
+            unmute(app, MuteSource.Manual)
             false
         } else {
-            mute(app, MuteSource.MANUAL)
+            mute(app, MuteSource.Manual)
             true
         }
     }
 
-    fun mute(context: Context, source: MuteSource = MuteSource.MANUAL) {
+    fun mute(
+        context: Context,
+        source: MuteSource = MuteSource.Manual,
+        dndLevelOverride: PrefsManager.DndLevel? = null
+    ) {
         val app = context.applicationContext
         val audioManager = app.getSystemService(AudioManager::class.java) ?: return
         val notificationManager = app.getSystemService(NotificationManager::class.java) ?: return
@@ -83,7 +87,8 @@ object MuteController {
         }
 
         // 3. Now engage Do Not Disturb on top of that.
-        val filter = when (PrefsManager.getDndLevel(app)) {
+        val targetDndLevel = dndLevelOverride ?: PrefsManager.getDndLevel(app)
+        val filter = when (targetDndLevel) {
             PrefsManager.DndLevel.TOTAL_SILENCE -> NotificationManager.INTERRUPTION_FILTER_NONE
             PrefsManager.DndLevel.PRIORITY_ONLY -> NotificationManager.INTERRUPTION_FILTER_PRIORITY
         }
@@ -99,7 +104,7 @@ object MuteController {
         refreshSurfaces(app)
     }
 
-    fun unmute(context: Context, source: MuteSource = MuteSource.MANUAL) {
+    fun unmute(context: Context, source: MuteSource = MuteSource.Manual) {
         val app = context.applicationContext
         val audioManager = app.getSystemService(AudioManager::class.java) ?: return
         val notificationManager = app.getSystemService(NotificationManager::class.java) ?: return

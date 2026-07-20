@@ -79,7 +79,6 @@ class DndSettingsActivity : ComponentActivity() {
     }
 }
 
-private enum class PickerTarget { START, END }
 private val autoRestoreOptions = listOf(0, 1, 2, 4, 8)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,22 +88,6 @@ private fun DndSettingsScreen(onBack: () -> Unit) {
     var excludeAlarm by remember { mutableStateOf(PrefsManager.getExcludeAlarm(context)) }
     var dndLevel by remember { mutableStateOf(PrefsManager.getDndLevel(context)) }
     var autoRestoreHours by remember { mutableStateOf(PrefsManager.getAutoRestoreHours(context)) }
-    var scheduleEnabled by remember { mutableStateOf(PrefsManager.isScheduleEnabled(context)) }
-    var scheduleStart by remember { mutableStateOf(PrefsManager.getScheduleStartMinutes(context)) }
-    var scheduleEnd by remember { mutableStateOf(PrefsManager.getScheduleEndMinutes(context)) }
-    var pickerTarget by remember { mutableStateOf<PickerTarget?>(null) }
-    val scheduleActive = scheduleEnabled && isWithinWindow(scheduleStart, scheduleEnd)
-
-    pickerTarget?.let { target ->
-        val initial = if (target == PickerTarget.START) scheduleStart else scheduleEnd
-        TimePickerDialog(initial, onDismiss = { pickerTarget = null }, onConfirm = { h, m ->
-            val value = h * 60 + m
-            if (target == PickerTarget.START) { scheduleStart = value; PrefsManager.setScheduleStartMinutes(context, value) }
-            else { scheduleEnd = value; PrefsManager.setScheduleEndMinutes(context, value) }
-            ScheduleManager.reschedule(context)
-            pickerTarget = null
-        })
-    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -216,49 +199,6 @@ private fun DndSettingsScreen(onBack: () -> Unit) {
                     }
                 }
             }
-
-            // Scheduled Silence card
-            SettingsCard {
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 4.dp)) {
-                        Icon(Icons.Default.Schedule, contentDescription = null, tint = SignalRed, modifier = Modifier.size(24.dp))
-                        Text(stringResource(R.string.setting_schedule_title), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = 12.dp))
-                    }
-                    Text(
-                        text = if (scheduleActive) stringResource(R.string.setting_schedule_active)
-                        else if (scheduleEnabled) stringResource(R.string.setting_schedule_configured)
-                        else stringResource(R.string.setting_schedule_desc),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (scheduleActive) SignalRed else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                    ListItem(
-                        headlineContent = { Text(stringResource(R.string.setting_schedule_enabled), style = MaterialTheme.typography.titleMedium) },
-                        supportingContent = { Text(stringResource(R.string.setting_schedule_daily), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                        trailingContent = {
-                            Switch(
-                                checked = scheduleEnabled,
-                                onCheckedChange = { scheduleEnabled = it; PrefsManager.setScheduleEnabled(context, it); ScheduleManager.reschedule(context) },
-                                colors = SwitchDefaults.colors(checkedThumbColor = SignalRed, checkedTrackColor = SignalRed.copy(alpha = 0.35f))
-                            )
-                        },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
-                    )
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                        ChoiceChip(
-                            label = stringResource(R.string.setting_schedule_start, formatTime(context, scheduleStart)),
-                            isSelected = false,
-                            onClick = { pickerTarget = PickerTarget.START },
-                            modifier = Modifier.weight(1f)
-                        )
-                        ChoiceChip(
-                            label = stringResource(R.string.setting_schedule_end, formatTime(context, scheduleEnd)),
-                            isSelected = false,
-                            onClick = { pickerTarget = PickerTarget.END },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -299,31 +239,4 @@ private fun ChoiceChip(label: String, isSelected: Boolean, onClick: () -> Unit, 
                 .padding(vertical = 12.dp)
         )
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TimePickerDialog(initialMinutes: Int, onDismiss: () -> Unit, onConfirm: (Int, Int) -> Unit) {
-    val state = rememberTimePickerState(
-        initialHour = initialMinutes / 60,
-        initialMinute = initialMinutes % 60,
-        is24Hour = android.text.format.DateFormat.is24HourFormat(LocalContext.current)
-    )
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.setting_schedule_pick_time)) },
-        text = { TimePicker(state) },
-        confirmButton = { TextButton(onClick = { onConfirm(state.hour, state.minute) }) { Text(stringResource(R.string.dialog_ok)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.dialog_cancel)) } }
-    )
-}
-
-private fun formatTime(context: android.content.Context, minutes: Int): String {
-    val c = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, minutes / 60); set(Calendar.MINUTE, minutes % 60) }
-    return DateFormat.getTimeInstance(DateFormat.SHORT).format(c.time)
-}
-
-private fun isWithinWindow(start: Int, end: Int): Boolean {
-    val now = Calendar.getInstance().let { it.get(Calendar.HOUR_OF_DAY) * 60 + it.get(Calendar.MINUTE) }
-    return if (start == end) false else if (start < end) now in start until end else now >= start || now < end
 }

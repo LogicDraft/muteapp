@@ -84,6 +84,20 @@
     <string name="about_version_desc">One-tap silence for Android</string>
     <string name="about_email">E-mail</string>
     <string name="about_github">GitHub</string>
+    <string name="schedules_title">Schedules</string>
+    <string name="schedules_subtitle">Automate your silence</string>
+    <string name="schedule_empty_state">No schedules yet.\nTap + to create one.</string>
+    <string name="schedule_add">Add Schedule</string>
+    <string name="schedule_edit">Edit Schedule</string>
+    <string name="schedule_label_hint">Label (e.g. Sleep, Work)</string>
+    <string name="schedule_dnd_level">Do Not Disturb mode</string>
+    <string name="schedule_days_every">Every day</string>
+    <string name="schedule_days_weekdays">Weekdays</string>
+    <string name="schedule_days_weekends">Weekends</string>
+    <string name="schedule_delete">Delete</string>
+    <string name="schedule_delete_confirm">Delete this schedule?</string>
+    <string name="schedule_deleted">Schedule deleted</string>
+    <string name="schedule_undo">Undo</string>
 </resources>
 
 

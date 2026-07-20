@@ -63,10 +63,20 @@ class MuteTileService : TileService() {
     }
 
     private fun scheduledSubtitle(): String {
-        if (PrefsManager.getMuteSource(this) != PrefsManager.MuteSource.SCHEDULED) return getString(R.string.tile_label_muted)
-        val minutes = PrefsManager.getScheduleEndMinutes(this)
-        val c = Calendar.getInstance().apply { set(Calendar.HOUR_OF_DAY, minutes / 60); set(Calendar.MINUTE, minutes % 60) }
-        return getString(R.string.tile_label_scheduled, DateFormat.getTimeFormat(this).format(c.time))
+        val source = PrefsManager.getMuteSource(this)
+        if (source is PrefsManager.MuteSource.Scheduled) {
+            val schedules = PrefsManager.getSchedules(this).filter { it.enabled }
+            val schedule = schedules.find { it.id == source.scheduleId }
+            if (schedule != null) {
+                val now = System.currentTimeMillis()
+                val currentWindow = com.logicdraftlabs.mute.core.ScheduleManager.getNextWindows(schedule).find { now in it.start..it.end }
+                if (currentWindow != null) {
+                    val c = Calendar.getInstance().apply { timeInMillis = currentWindow.end }
+                    return getString(R.string.tile_label_scheduled, DateFormat.getTimeFormat(this).format(c.time))
+                }
+            }
+        }
+        return getString(R.string.tile_label_muted)
     }
 
     private fun openPermissionSettings() {

@@ -171,11 +171,9 @@ private fun MainScreen(refreshTick: Int) {
                 modifier = Modifier.padding(bottom = 36.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(R.string.usage_hint),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
+                StatusHintText(
+                    context = context,
+                    isMuted = isMuted,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp)
                 )
                 Text(
@@ -304,3 +302,53 @@ private fun rememberReducedMotion(): Boolean {
         ) == 0f
     }
 }
+
+@Composable
+private fun StatusHintText(context: Context, isMuted: Boolean, modifier: Modifier = Modifier) {
+    val schedules = remember(isMuted) { com.logicdraftlabs.mute.data.PrefsManager.getSchedules(context).filter { it.enabled } }
+    
+    val hint = remember(schedules, isMuted) {
+        val now = System.currentTimeMillis()
+        val allWindows = schedules.flatMap { com.logicdraftlabs.mute.core.ScheduleManager.getNextWindows(it).map { w -> it to w } }
+        
+        val currentSource = com.logicdraftlabs.mute.data.PrefsManager.getMuteSource(context)
+        
+        if (isMuted && currentSource is com.logicdraftlabs.mute.data.PrefsManager.MuteSource.Scheduled) {
+            val activeSchedule = schedules.find { it.id == currentSource.scheduleId }
+            if (activeSchedule != null) {
+                val currentWindow = allWindows.find { it.first.id == activeSchedule.id && now in it.second.start..it.second.end }
+                if (currentWindow != null) {
+                    val endCal = java.util.Calendar.getInstance().apply { timeInMillis = currentWindow.second.end }
+                    val formatter = java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT)
+                    return@remember "Muted by ${activeSchedule.label} until ${formatter.format(endCal.time)}"
+                }
+            }
+        }
+        
+        val nextWindow = allWindows.filter { it.second.start > now }.minByOrNull { it.second.start }
+        if (nextWindow != null) {
+            val startCal = java.util.Calendar.getInstance().apply { timeInMillis = nextWindow.second.start }
+            val formatter = java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT)
+            
+            val dayStr = if (startCal.get(java.util.Calendar.DAY_OF_YEAR) == java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)) {
+                "today"
+            } else if (startCal.get(java.util.Calendar.DAY_OF_YEAR) == java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR) + 1) {
+                "tomorrow"
+            } else {
+                "soon" // simplified
+            }
+            return@remember "Next: ${nextWindow.first.label} $dayStr at ${formatter.format(startCal.time)}"
+        }
+        
+        return@remember context.getString(R.string.usage_hint)
+    }
+    
+    Text(
+        text = hint,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        modifier = modifier
+    )
+}
+
