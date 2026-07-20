@@ -170,7 +170,7 @@ private fun DndSettingsScreen(onBack: () -> Unit) {
                     }
                     Text(
                         text = if (dndLevel == PrefsManager.DndLevel.TOTAL_SILENCE)
-                            stringResource(R.string.setting_dnd_total_silence_desc) + ". This also overrides "Keep alarm audible" — pick Priority Only if alarms must ring."
+                            stringResource(R.string.setting_dnd_total_silence_desc) + ". This also overrides \"Keep alarm audible\" — pick Priority Only if alarms must ring."
                         else stringResource(R.string.setting_dnd_priority_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -198,7 +198,6 @@ private fun DndSettingsScreen(onBack: () -> Unit) {
                         }
                     }
                 }
-            }
             }
 
             Spacer(Modifier.height(24.dp))

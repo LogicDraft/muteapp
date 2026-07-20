@@ -58,9 +58,9 @@ class MuteControlsProviderService : ControlsProviderService() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        return Control.StatelessBuilder(CONTROL_ID, pi)
+        return Control.StatefulBuilder(CONTROL_ID, pi)
             .setTitle(getString(R.string.app_name))
-            .setSubtitle(getString(if (isMuted) R.string.widget_on else R.string.widget_off))
+            .setSubtitle(getString(if (isMuted) R.string.widget_status_muted else R.string.widget_status_active))
             .setDeviceType(android.service.controls.DeviceTypes.TYPE_GENERIC_ON_OFF)
             .setStatus(Control.STATUS_OK)
             .setControlTemplate(

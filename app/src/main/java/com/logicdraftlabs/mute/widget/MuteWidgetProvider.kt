@@ -48,7 +48,7 @@ class MuteWidgetProvider : AppWidgetProvider() {
             )
             // Also update the Glance widget so it reflects the new mute state immediately.
             MainScope().launch {
-                updateAll<MuteGlanceWidget>(context)
+                MuteGlanceWidget().updateAll(context)
             }
         }
     }

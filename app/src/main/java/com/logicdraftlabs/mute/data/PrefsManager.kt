@@ -32,7 +32,6 @@ object PrefsManager {
     private const val KEY_SETTING_DND_LEVEL = "setting_dnd_level"
     private const val KEY_SETTING_AUTO_RESTORE_HOURS = "setting_auto_restore_hours"
     private const val KEY_SETTING_PERSISTENT_NOTIFICATION = "setting_persistent_notification"
-    private const val KEY_SETTING_DYNAMIC_COLOR = "setting_dynamic_color"
     private const val KEY_SCHEDULES = "schedules_json"
 
     enum class DndLevel { TOTAL_SILENCE, PRIORITY_ONLY }
@@ -167,13 +166,5 @@ object PrefsManager {
 
     fun setShowPersistentNotification(context: Context, show: Boolean) {
         prefs(context).edit().putBoolean(KEY_SETTING_PERSISTENT_NOTIFICATION, show).apply()
-    }
-
-    /** Dynamic color (Material You) — off by default; only effective on API 31+. */
-    fun getDynamicColor(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_SETTING_DYNAMIC_COLOR, false)
-
-    fun setDynamicColor(context: Context, enabled: Boolean) {
-        prefs(context).edit().putBoolean(KEY_SETTING_DYNAMIC_COLOR, enabled).apply()
     }
 }
