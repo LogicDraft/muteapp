@@ -70,6 +70,24 @@ import com.logicdraftlabs.mute.R
 import com.logicdraftlabs.mute.core.MuteController
 import com.logicdraftlabs.mute.core.MuteStateBus
 import com.logicdraftlabs.mute.ui.theme.MuteTheme
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Path
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 
 
 class MainActivity : ComponentActivity() {
@@ -100,18 +118,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -172,7 +179,7 @@ private fun MainScreen(refreshTick: Int) {
                     }
                 )
             } else {
-                ToggleButton(
+                AnimatedCircularToggleButton(
                     isMuted = isMuted,
                     onTap = {
                         isMuted = MuteController.toggle(context)
@@ -225,42 +232,169 @@ private fun PermissionPrompt(onGrant: () -> Unit) {
     }
 }
 
+
+
 @Composable
-private fun ToggleButton(isMuted: Boolean, onTap: () -> Unit) {
+private fun AnimatedCircularToggleButton(isMuted: Boolean, onTap: () -> Unit) {
     val reducedMotion = rememberReducedMotion()
+    
+    var shockwaves by remember { mutableStateOf(listOf<Long>()) }
+
     val transition = updateTransition(targetState = isMuted, label = "dial_transition")
     
     val containerColor by transition.animateColor(
         transitionSpec = { if (reducedMotion) snap() else tween(300) },
         label = "dial_container_color"
     ) { muted -> 
-        if (muted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant 
+        if (muted) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant 
     }
     
     val contentColor by transition.animateColor(
         transitionSpec = { if (reducedMotion) snap() else tween(300) },
         label = "dial_content_color"
     ) { muted -> 
-        if (muted) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant 
+        if (muted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant 
     }
+    
+    val dialScale by transition.animateFloat(
+        transitionSpec = { if (reducedMotion) snap() else spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow) },
+        label = "dial_scale"
+    ) { muted -> if (muted) 1.05f else 1f }
     
     val actionLabel = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active)
 
-    Button(
-        onClick = onTap,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp),
-        shape = RoundedCornerShape(24.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor
-        )
-    ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "animations")
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "glow_rotation"
+    )
+
+    // Time driver forces recomposition for the Canvas animations
+    val timeDriver by infiniteTransition.animateFloat(
+        initialValue = 0f, targetValue = 1f, 
+        animationSpec = infiniteRepeatable(tween(1000, easing = LinearEasing)),
+        label = "time_driver"
+    )
+
+    // Reusable Path to avoid GC thrashing and RAM issues
+    val wavePath = remember { Path() }
+    val glowColor = MaterialTheme.colorScheme.primary
+
+    LaunchedEffect(timeDriver) {
+        if (shockwaves.isNotEmpty()) {
+            val currentTime = System.currentTimeMillis()
+            val filtered = shockwaves.filter { currentTime - it < 1500 }
+            if (filtered.size != shockwaves.size) {
+                shockwaves = filtered
+            }
+        }
+    }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            contentAlignment = Alignment.Center, 
+            modifier = Modifier.fillMaxWidth().heightIn(min = 350.dp)
+        ) {
+            // Shockwave Canvas - Low CPU footprint, no new object allocations in draw loop
+            if (!reducedMotion && shockwaves.isNotEmpty()) {
+                Canvas(modifier = Modifier.size(350.dp)) {
+                    val currentTime = System.currentTimeMillis()
+                    val center = Offset(size.width / 2, size.height / 2)
+                    
+                    for (startT in shockwaves) {
+                        val age = (currentTime - startT) / 1500f
+                        if (age > 1f) continue
+                        
+                        val baseRadius = 95.dp.toPx() + (age * 120.dp.toPx())
+                        val alpha = (1f - age).coerceIn(0f, 1f)
+                        val color = glowColor.copy(alpha = alpha * 0.6f)
+                        
+                        for (layer in 0..2) {
+                            wavePath.rewind()
+                            val points = 60
+                            val angleStep = (Math.PI * 2) / points
+                            val frequency = 4 + layer
+                            val amplitude = 15.dp.toPx() * (1f - age)
+                            val phase = (currentTime / 300f) + (layer * 1f)
+                            
+                            for (i in 0..points) {
+                                val angle = i * angleStep
+                                val waveOffset = kotlin.math.sin((angle * frequency) + phase).toFloat() * amplitude
+                                val r = baseRadius + waveOffset
+                                val x = center.x + r * kotlin.math.cos(angle).toFloat()
+                                val y = center.y + r * kotlin.math.sin(angle).toFloat()
+                                if (i == 0) wavePath.moveTo(x, y) else wavePath.lineTo(x, y)
+                            }
+                            wavePath.close()
+                            drawPath(wavePath, color, style = Stroke(width = 2.dp.toPx()))
+                        }
+                    }
+                }
+            }
+
+            // Glowing Rotating Border
+            Canvas(
+                modifier = Modifier
+                    .size(200.dp)
+                    .graphicsLayer { 
+                        rotationZ = rotation 
+                        scaleX = dialScale
+                        scaleY = dialScale
+                    }
+            ) {
+                drawCircle(
+                    brush = Brush.sweepGradient(
+                        0.0f to Color.Transparent,
+                        0.7f to Color.Transparent,
+                        0.95f to glowColor,
+                        1.0f to Color.Transparent
+                    ),
+                    radius = size.minDimension / 2,
+                    style = Stroke(width = 4.dp.toPx())
+                )
+            }
+
+            // Central Circular Button
+            Surface(
+                onClick = { 
+                    onTap()
+                    if (!reducedMotion) {
+                        shockwaves = shockwaves + System.currentTimeMillis()
+                    }
+                },
+                shape = CircleShape,
+                color = containerColor,
+                contentColor = contentColor,
+                modifier = Modifier
+                    .size(190.dp)
+                    .graphicsLayer {
+                        scaleX = dialScale
+                        scaleY = dialScale
+                    }
+                    .semantics {
+                        contentDescription = actionLabel
+                    }
+            ) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = if (isMuted) stringResource(R.string.status_muted) else stringResource(R.string.status_active),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
+            }
+        }
+
         Text(
-            text = if (isMuted) stringResource(R.string.status_muted) else stringResource(R.string.status_active),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.ExtraBold
+            text = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 18.dp)
         )
     }
 }
