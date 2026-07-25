@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- TURN_ON_SILENT_MODE capability -->
+    <capability android:name="actions.intent.TURN_ON_SILENT_MODE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.logicdraftlabs.mute"
+            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            <parameter
+                android:name="action"
+                android:key="voice_action" />
+        </intent>
+    </capability>
+
+    <!-- TURN_OFF_SILENT_MODE capability -->
+    <capability android:name="actions.intent.TURN_OFF_SILENT_MODE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.logicdraftlabs.mute"
+            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            <parameter
+                android:name="action"
+                android:key="voice_action" />
+        </intent>
+    </capability>
+
+    <!-- Custom Mute capability for Gemini typed commands -->
+    <capability android:name="custom.actions.intent.MUTE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.logicdraftlabs.mute"
+            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            <parameter
+                android:name="action"
+                android:key="voice_action" />
+        </intent>
+    </capability>
+
+    <!-- Custom Unmute capability for Gemini typed commands -->
+    <capability android:name="custom.actions.intent.UNMUTE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.logicdraftlabs.mute"
+            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            <parameter
+                android:name="action"
+                android:key="voice_action" />
+        </intent>
+    </capability>
+
+    <shortcut
+        android:shortcutId="shortcut_mute"
+        android:shortcutShortLabel="@string/shortcut_mute_short"
+        android:shortcutLongLabel="@string/shortcut_mute_long">
+        <capability-binding android:key="actions.intent.TURN_ON_SILENT_MODE">
+            <parameter-binding android:key="voice_action" android:value="mute" />
+        </capability-binding>
+        <capability-binding android:key="custom.actions.intent.MUTE">
+            <parameter-binding android:key="voice_action" android:value="mute" />
+        </capability-binding>
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.logicdraftlabs.mute"
+            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            <extra android:name="voice_action" android:value="mute" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_unmute"
+        android:shortcutShortLabel="@string/shortcut_unmute_short"
+        android:shortcutLongLabel="@string/shortcut_unmute_long">
+        <capability-binding android:key="actions.intent.TURN_OFF_SILENT_MODE">
+            <parameter-binding android:key="voice_action" android:value="unmute" />
+        </capability-binding>
+        <capability-binding android:key="custom.actions.intent.UNMUTE">
+            <parameter-binding android:key="voice_action" android:value="unmute" />
+        </capability-binding>
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.logicdraftlabs.mute"
+            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            <extra android:name="voice_action" android:value="unmute" />
+        </intent>
+    </shortcut>
+</shortcuts>

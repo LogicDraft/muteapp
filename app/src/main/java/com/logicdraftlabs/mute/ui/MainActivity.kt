@@ -100,6 +100,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        handleIntent(intent)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(AndroidColor.TRANSPARENT)
@@ -108,6 +109,73 @@ class MainActivity : ComponentActivity() {
             MuteTheme {
                 MainScreen(refreshTick = refreshTick.value)
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent == null) return
+
+        var targetAction: String? = intent.getStringExtra("voice_action")
+
+        // Parse search / typed queries from Gemini / Google Assistant
+        val query = intent.getStringExtra(android.app.SearchManager.QUERY)
+            ?: intent.getStringExtra("query")
+            ?: intent.dataString
+
+        if (targetAction == null && query != null) {
+            val lowerQuery = query.lowercase()
+            when {
+                lowerQuery.contains("unmute") || lowerQuery.contains("turn off") || lowerQuery.contains("stop") || lowerQuery.endsWith("/unmute") || lowerQuery.endsWith("off") -> {
+                    targetAction = "unmute"
+                }
+                lowerQuery.contains("mute") || lowerQuery.contains("turn on") || lowerQuery.contains("silent") || lowerQuery.endsWith("/mute") || lowerQuery.endsWith("on") -> {
+                    targetAction = "mute"
+                }
+                lowerQuery.contains("toggle") || lowerQuery.endsWith("/toggle") -> {
+                    targetAction = "toggle"
+                }
+            }
+        }
+
+        // Check Uri data scheme / host / path
+        val uriData = intent.data
+        if (targetAction == null && uriData != null) {
+            val path = uriData.path ?: uriData.host ?: ""
+            when {
+                path.contains("unmute") || path.contains("off") -> targetAction = "unmute"
+                path.contains("mute") || path.contains("on") -> targetAction = "mute"
+                path.contains("toggle") -> targetAction = "toggle"
+            }
+        }
+
+        if (targetAction != null) {
+            val isCurrentlyMuted = MuteController.isMuted(this)
+            when (targetAction) {
+                "mute", "on" -> {
+                    if (!isCurrentlyMuted) {
+                        MuteController.toggleMute(this)
+                    }
+                    android.widget.Toast.makeText(this, R.string.widget_status_muted, android.widget.Toast.LENGTH_SHORT).show()
+                }
+                "unmute", "off" -> {
+                    if (isCurrentlyMuted) {
+                        MuteController.toggleMute(this)
+                    }
+                    android.widget.Toast.makeText(this, R.string.tile_label_active, android.widget.Toast.LENGTH_SHORT).show()
+                }
+                "toggle" -> {
+                    MuteController.toggleMute(this)
+                    val newStatus = if (MuteController.isMuted(this)) R.string.widget_status_muted else R.string.tile_label_active
+                    android.widget.Toast.makeText(this, newStatus, android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+            refreshTick.value++
         }
     }
 

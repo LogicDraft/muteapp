@@ -1,23 +1,29 @@
 <resources>
-    <string name="app_name">MUTE.</string>
+    <string name="app_name">Muto</string>
 
     <!-- Main screen -->
-    <string name="status_muted">MUTED</string>
-    <string name="status_active">ACTIVE</string>
+    <string name="status_muted">MUTE</string>
+    <string name="status_active">UNMUTE</string>
     <string name="hint_muted">Tap to restore sound</string>
     <string name="hint_active">Tap to go silent</string>
     <string name="permission_title">One-time setup</string>
-    <string name="permission_body">MUTE. needs Do Not Disturb access to control ringer, media, and call sounds in one tap. This isn\'t a normal permission dialog Ã¢â‚¬â€ Android opens a system settings screen for it.</string>
+    <string name="permission_body">Muto needs Do Not Disturb access to control ringer, media, and call sounds in one tap. This isn\'t a normal permission dialog — Android opens a system settings screen for it.</string>
     <string name="permission_grant">Grant Do Not Disturb access</string>
     <string name="permission_missing_short">DND access needed</string>
     <string name="settings_link">Settings</string>
-    <string name="usage_hint">Add the MUTE. Quick Settings tile or home-screen widget for one-tap access without opening the app.</string>
+    <string name="usage_hint">Add the Muto Quick Settings tile or home-screen widget for one-tap access without opening the app.</string>
 
     <!-- Quick Settings tile -->
     <string name="tile_label_muted">Muted</string>
     <string name="tile_label_scheduled">Muted Â· until %1$s</string>
     <string name="tile_label_active">Unmuted</string>
     <string name="tile_label_permission">Tap to allow</string>
+
+    <!-- App Shortcuts & Voice Actions -->
+    <string name="shortcut_mute_short">Mute</string>
+    <string name="shortcut_mute_long">Turn on Muto</string>
+    <string name="shortcut_unmute_short">Unmute</string>
+    <string name="shortcut_unmute_long">Turn off Muto</string>
 
     <!-- Widget -->
     <string name="widget_label">MUTE</string>
@@ -28,7 +34,7 @@
 
     <!-- Notification -->
     <string name="notif_channel_name">Silent mode status</string>
-    <string name="notif_channel_desc">Shows when MUTE. has silenced the phone</string>
+    <string name="notif_channel_desc">Shows when Muto has silenced the phone</string>
     <string name="notif_title">Silent mode on</string>
     <string name="notif_text">Tap to restore sound</string>
     <string name="notif_action_restore">Restore</string>
