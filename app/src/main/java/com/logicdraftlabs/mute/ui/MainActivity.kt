@@ -11,6 +11,9 @@ import android.provider.Settings
 import androidx.activity.SystemBarStyle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.graphics.SolidColor
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -234,27 +237,34 @@ private fun PermissionPrompt(onGrant: () -> Unit) {
 
 
 
+
+
 @Composable
 private fun AnimatedCircularToggleButton(isMuted: Boolean, onTap: () -> Unit) {
     val reducedMotion = rememberReducedMotion()
     
-    var shockwaves by remember { mutableStateOf(listOf<Long>()) }
-
     val transition = updateTransition(targetState = isMuted, label = "dial_transition")
     
-    val containerColor by transition.animateColor(
-        transitionSpec = { if (reducedMotion) snap() else tween(300) },
-        label = "dial_container_color"
+    // Animate fill factor from 0f (outline) to 1f (solid disc)
+    val fillFactor by transition.animateFloat(
+        transitionSpec = { if (reducedMotion) snap() else tween(500, easing = LinearEasing) },
+        label = "fill_factor"
     ) { muted -> 
-        if (muted) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant 
+        if (muted) 1f else 0f 
     }
     
-    val contentColor by transition.animateColor(
-        transitionSpec = { if (reducedMotion) snap() else tween(300) },
-        label = "dial_content_color"
-    ) { muted -> 
-        if (muted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant 
+    // One-shot effect progress from 0f to 1f on every toggle
+    val effectProgress = remember { Animatable(1f) }
+    LaunchedEffect(isMuted) {
+        if (!reducedMotion) {
+            effectProgress.snapTo(0f)
+            effectProgress.animateTo(1f, tween(500, easing = LinearEasing))
+        } else {
+            effectProgress.snapTo(1f)
+        }
     }
+    
+    val p = effectProgress.value
     
     val dialScale by transition.animateFloat(
         transitionSpec = { if (reducedMotion) snap() else spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow) },
@@ -262,131 +272,115 @@ private fun AnimatedCircularToggleButton(isMuted: Boolean, onTap: () -> Unit) {
     ) { muted -> if (muted) 1.05f else 1f }
     
     val actionLabel = if (isMuted) stringResource(R.string.hint_muted) else stringResource(R.string.hint_active)
-
-    val infiniteTransition = rememberInfiniteTransition(label = "animations")
-    val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(4000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "glow_rotation"
-    )
-
-    // Time driver forces recomposition for the Canvas animations
-    val timeDriver by infiniteTransition.animateFloat(
-        initialValue = 0f, targetValue = 1f, 
-        animationSpec = infiniteRepeatable(tween(1000, easing = LinearEasing)),
-        label = "time_driver"
-    )
-
-    // Reusable Path to avoid GC thrashing and RAM issues
-    val wavePath = remember { Path() }
-    val glowColor = MaterialTheme.colorScheme.primary
-
-    LaunchedEffect(timeDriver) {
-        if (shockwaves.isNotEmpty()) {
-            val currentTime = System.currentTimeMillis()
-            val filtered = shockwaves.filter { currentTime - it < 1500 }
-            if (filtered.size != shockwaves.size) {
-                shockwaves = filtered
-            }
-        }
-    }
-
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
+    val outlineColor = MaterialTheme.colorScheme.primary
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurfaceVariant
+    
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             contentAlignment = Alignment.Center, 
             modifier = Modifier.fillMaxWidth().heightIn(min = 350.dp)
         ) {
-            // Shockwave Canvas - Low CPU footprint, no new object allocations in draw loop
-            if (!reducedMotion && shockwaves.isNotEmpty()) {
-                Canvas(modifier = Modifier.size(350.dp)) {
-                    val currentTime = System.currentTimeMillis()
-                    val center = Offset(size.width / 2, size.height / 2)
-                    
-                    for (startT in shockwaves) {
-                        val age = (currentTime - startT) / 1500f
-                        if (age > 1f) continue
-                        
-                        val baseRadius = 95.dp.toPx() + (age * 120.dp.toPx())
-                        val alpha = (1f - age).coerceIn(0f, 1f)
-                        val color = glowColor.copy(alpha = alpha * 0.6f)
-                        
-                        for (layer in 0..2) {
-                            wavePath.rewind()
-                            val points = 60
-                            val angleStep = (Math.PI * 2) / points
-                            val frequency = 4 + layer
-                            val amplitude = 15.dp.toPx() * (1f - age)
-                            val phase = (currentTime / 300f) + (layer * 1f)
-                            
-                            for (i in 0..points) {
-                                val angle = i * angleStep
-                                val waveOffset = kotlin.math.sin((angle * frequency) + phase).toFloat() * amplitude
-                                val r = baseRadius + waveOffset
-                                val x = center.x + r * kotlin.math.cos(angle).toFloat()
-                                val y = center.y + r * kotlin.math.sin(angle).toFloat()
-                                if (i == 0) wavePath.moveTo(x, y) else wavePath.lineTo(x, y)
-                            }
-                            wavePath.close()
-                            drawPath(wavePath, color, style = Stroke(width = 2.dp.toPx()))
-                        }
-                    }
-                }
-            }
-
-            // Glowing Rotating Border
+            // Main Button Canvas
             Canvas(
-                modifier = Modifier
-                    .size(200.dp)
-                    .graphicsLayer { 
-                        rotationZ = rotation 
-                        scaleX = dialScale
-                        scaleY = dialScale
-                    }
-            ) {
-                drawCircle(
-                    brush = Brush.sweepGradient(
-                        0.0f to Color.Transparent,
-                        0.7f to Color.Transparent,
-                        0.95f to glowColor,
-                        1.0f to Color.Transparent
-                    ),
-                    radius = size.minDimension / 2,
-                    style = Stroke(width = 4.dp.toPx())
-                )
-            }
-
-            // Central Circular Button
-            Surface(
-                onClick = { 
-                    onTap()
-                    if (!reducedMotion) {
-                        shockwaves = shockwaves + System.currentTimeMillis()
-                    }
-                },
-                shape = CircleShape,
-                color = containerColor,
-                contentColor = contentColor,
                 modifier = Modifier
                     .size(190.dp)
                     .graphicsLayer {
                         scaleX = dialScale
                         scaleY = dialScale
                     }
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null, // Disable default ripple since we draw our own
+                        onClick = onTap
+                    )
                     .semantics {
                         contentDescription = actionLabel
                     }
             ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = if (isMuted) stringResource(R.string.status_muted) else stringResource(R.string.status_active),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.ExtraBold
+                val radius = size.minDimension / 2
+                
+                // 1. Ring/Disc Fill Morph
+                val minStroke = 3.dp.toPx()
+                val currentStroke = minStroke + (radius - minStroke) * fillFactor
+                drawCircle(
+                    color = primaryColor,
+                    radius = radius - (currentStroke / 2),
+                    style = Stroke(width = currentStroke)
+                )
+                
+                // 2. Ripple Burst (Sonar Pings)
+                if (p < 1f) {
+                    for (i in 0 until 4) {
+                        val delay = i * 0.12f
+                        val rippleP = ((p - delay) / (1f - delay)).coerceIn(0f, 1f)
+                        if (rippleP > 0f) {
+                            val rippleRadius = radius + (rippleP * 120.dp.toPx())
+                            val rippleAlpha = (1f - rippleP) * 0.5f
+                            drawCircle(
+                                color = primaryColor.copy(alpha = rippleAlpha),
+                                radius = rippleRadius,
+                                style = Stroke(width = 2.dp.toPx())
+                            )
+                        }
+                    }
+                }
+                
+                // 3. Diagonal Light Sweep
+                if (p < 1f) {
+                    val sweepOffset = -radius + (p * radius * 3)
+                    drawCircle(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color.Transparent, Color.White.copy(alpha = 0.4f), Color.Transparent),
+                            start = Offset(sweepOffset, sweepOffset),
+                            end = Offset(sweepOffset + 150f, sweepOffset + 150f)
+                        ),
+                        radius = radius
                     )
                 }
+                
+                // 4. Center Flash
+                if (p in 0.3f..0.7f) {
+                    val flashP = if (p < 0.5f) (p - 0.3f) / 0.2f else (0.7f - p) / 0.2f
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color.White.copy(alpha = flashP * 0.6f), Color.Transparent),
+                            center = center,
+                            radius = radius * 0.8f
+                        ),
+                        radius = radius
+                    )
+                }
+            }
+            
+            // Text Label with Crossfade
+            // We use Box to center the text over the canvas
+            Box(
+                contentAlignment = Alignment.Center, 
+                modifier = Modifier
+                    .size(190.dp)
+                    .graphicsLayer {
+                        scaleX = dialScale
+                        scaleY = dialScale
+                    }
+            ) {
+                // Determine text color based on fill factor to ensure contrast
+                // If fillFactor > 0.5, we're mostly filled, use onPrimaryColor, else use onSurfaceColor
+                val textColor = if (fillFactor > 0.5f) onPrimaryColor else onSurfaceColor
+                
+                Text(
+                    text = if (isMuted) stringResource(R.string.status_muted) else stringResource(R.string.status_active),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = textColor,
+                    // Alpha crossfade during transition midpoint
+                    modifier = Modifier.graphicsLayer {
+                        alpha = if (p in 0.3f..0.7f) {
+                            if (p < 0.5f) 1f - ((p - 0.3f) / 0.2f) else ((p - 0.5f) / 0.2f)
+                        } else 1f
+                    }
+                )
             }
         }
 
