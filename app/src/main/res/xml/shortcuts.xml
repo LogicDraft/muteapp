@@ -103,8 +103,8 @@
 
     <shortcut
         android:shortcutId="shortcut_toggle"
-        android:shortcutShortLabel="Toggle Muto"
-        android:shortcutLongLabel="Toggle Muto Sound State">
+        android:shortcutShortLabel="@string/shortcut_toggle_short"
+        android:shortcutLongLabel="@string/shortcut_toggle_long">
         <capability-binding android:key="custom.actions.intent.TOGGLE">
             <parameter-binding android:key="voice_action" android:value="toggle" />
         </capability-binding>

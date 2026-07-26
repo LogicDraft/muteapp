@@ -24,6 +24,8 @@
     <string name="shortcut_mute_long">Turn on Muto</string>
     <string name="shortcut_unmute_short">Unmute</string>
     <string name="shortcut_unmute_long">Turn off Muto</string>
+    <string name="shortcut_toggle_short">Toggle</string>
+    <string name="shortcut_toggle_long">Toggle Muto</string>
 
     <!-- Widget -->
     <string name="widget_label">MUTE</string>

@@ -32,7 +32,10 @@ object PrefsManager {
     private const val KEY_SETTING_DND_LEVEL = "setting_dnd_level"
     private const val KEY_SETTING_AUTO_RESTORE_HOURS = "setting_auto_restore_hours"
     private const val KEY_SETTING_PERSISTENT_NOTIFICATION = "setting_persistent_notification"
+    private const val KEY_SETTING_DYNAMIC_COLOR = "setting_dynamic_color"
+    private const val KEY_SETTING_THEME = "setting_theme"
     private const val KEY_SETTING_WIDGET_SHAPE = "setting_widget_shape"
+    private const val KEY_SCHEDULES = "schedules_json"
 
     const val THEME_SYSTEM = "system"
     const val THEME_LIGHT = "light"

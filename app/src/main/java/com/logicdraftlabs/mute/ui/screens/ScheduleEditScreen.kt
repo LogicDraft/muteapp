@@ -57,9 +57,9 @@ fun ScheduleEditScreen(
             )
         )
     }
-    var overrideDnd by remember { mutableStateOf(existingSchedule?.dndLevelOverride != null) }
+    var overrideDnd by remember { mutableStateOf(existingSchedule != null) }
     var dndOverrideLevel by remember {
-        mutableStateOf(existingSchedule?.dndLevelOverride ?: PrefsManager.DndLevel.TOTAL_SILENCE)
+        mutableStateOf(existingSchedule?.dndLevel ?: PrefsManager.DndLevel.TOTAL_SILENCE)
     }
 
     var showStartTimePicker by remember { mutableStateOf(false) }
@@ -240,7 +240,7 @@ fun ScheduleEditScreen(
                         endMinuteOfDay = endMinute,
                         days = selectedDays,
                         enabled = existingSchedule?.enabled ?: true,
-                        dndLevelOverride = if (overrideDnd) dndOverrideLevel else null
+                        dndLevel = if (overrideDnd) dndOverrideLevel else PrefsManager.DndLevel.TOTAL_SILENCE
                     )
                     viewModel.saveSchedule(context, finalSchedule)
                     onSaveSuccess()
