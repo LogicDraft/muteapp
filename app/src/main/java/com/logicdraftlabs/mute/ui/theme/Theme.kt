@@ -45,13 +45,12 @@ private val LightColors = lightColorScheme(
 
 @Composable
 fun MuteTheme(
+    themePref: String = PrefsManager.getThemePreference(LocalContext.current),
+    dynamicColorsEnabled: Boolean = PrefsManager.isDynamicColorEnabled(LocalContext.current),
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
     val isSystemDark = isSystemInDarkTheme()
-    
-    val themePref = PrefsManager.getThemePreference(context)
-    val dynamicColorsEnabled = PrefsManager.isDynamicColorEnabled(context)
     
     val darkTheme = when (themePref) {
         PrefsManager.THEME_SYSTEM -> isSystemDark

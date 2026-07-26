@@ -206,9 +206,13 @@ private fun ScheduleCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
             Switch(
                 checked = schedule.enabled,
-                onCheckedChange = onToggle,
+                onCheckedChange = {
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    onToggle(it)
+                },
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = MaterialTheme.colorScheme.primary,
                     checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)

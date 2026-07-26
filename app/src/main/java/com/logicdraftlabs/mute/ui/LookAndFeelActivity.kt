@@ -57,12 +57,14 @@ class LookAndFeelActivity : ComponentActivity() {
         )
         
         setContent {
-            // Read state here so changes instantly reflect without recreation
             val context = LocalContext.current
             var themePref by remember { mutableStateOf(PrefsManager.getThemePreference(context)) }
             var dynamicColors by remember { mutableStateOf(PrefsManager.isDynamicColorEnabled(context)) }
             
-            MuteTheme {
+            MuteTheme(
+                themePref = themePref,
+                dynamicColorsEnabled = dynamicColors
+            ) {
                 LookAndFeelScreen(
                     themePref = themePref,
                     dynamicColorsEnabled = dynamicColors,

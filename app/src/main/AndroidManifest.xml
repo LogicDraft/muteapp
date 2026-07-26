@@ -89,6 +89,12 @@
             android:label="@string/settings_look_feel_title"
             android:theme="@style/Theme.Mute" />
 
+        <activity
+            android:name=".ui.PrivacyPolicyActivity"
+            android:exported="false"
+            android:label="Privacy Policy"
+            android:theme="@style/Theme.Mute" />
+
         <!-- Quick Settings tile: the primary, no-app-UI entry point. -->
         <service
             android:name=".tile.MuteTileService"

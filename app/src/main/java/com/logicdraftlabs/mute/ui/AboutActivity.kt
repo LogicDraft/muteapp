@@ -217,6 +217,33 @@ private fun AboutScreen(onBack: () -> Unit) {
                         }
                     )
                 }
+            // Privacy Policy card matching MDify AboutScreen
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        context.startActivity(Intent(context, PrivacyPolicyActivity::class.java))
+                    },
+                shape = RoundedCornerShape(22.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+            ) {
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    headlineContent = {
+                        Text("Privacy Policy", style = MaterialTheme.typography.titleMedium)
+                    },
+                    supportingContent = {
+                        Text("Learn how your data is handled locally", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                )
             }
 
             Spacer(Modifier.height(32.dp))

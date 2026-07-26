@@ -310,6 +310,7 @@ private fun PermissionPrompt(onGrant: () -> Unit) {
 @Composable
 private fun AnimatedCircularToggleButton(isMuted: Boolean, onTap: () -> Unit) {
     val reducedMotion = rememberReducedMotion()
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     
     val transition = updateTransition(targetState = isMuted, label = "dial_transition")
     
@@ -335,7 +336,10 @@ private fun AnimatedCircularToggleButton(isMuted: Boolean, onTap: () -> Unit) {
     val p = effectProgress.value
     
     val dialScale by transition.animateFloat(
-        transitionSpec = { if (reducedMotion) snap() else spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow) },
+        transitionSpec = { 
+            if (reducedMotion) snap() 
+            else spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow) 
+        },
         label = "dial_scale"
     ) { muted -> if (muted) 1.05f else 1f }
     
@@ -361,7 +365,10 @@ private fun AnimatedCircularToggleButton(isMuted: Boolean, onTap: () -> Unit) {
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null, // Disable default ripple since we draw our own
-                        onClick = onTap
+                        onClick = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            onTap()
+                        }
                     )
                     .semantics {
                         contentDescription = actionLabel
