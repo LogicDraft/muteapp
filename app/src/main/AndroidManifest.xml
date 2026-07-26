@@ -50,6 +50,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <action android:name="android.intent.action.VOICE_COMMAND" />
+                <action android:name="actions.intent.TURN_ON_SILENT_MODE" />
+                <action android:name="actions.intent.TURN_OFF_SILENT_MODE" />
+                <action android:name="actions.intent.OPEN_APP_FEATURE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
@@ -137,7 +140,13 @@
         <!-- Shared toggle target for the widget tap and the notification's "Restore" action. -->
         <receiver
             android:name=".receiver.ToggleReceiver"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.logicdraftlabs.mute.action.TOGGLE_MUTE" />
+                <action android:name="com.logicdraftlabs.mute.action.MUTE" />
+                <action android:name="com.logicdraftlabs.mute.action.UNMUTE" />
+            </intent-filter>
+        </receiver>
 
         <!-- Re-arms the auto-restore AlarmManager alarm after a reboot (alarms don't survive one). -->
         <receiver

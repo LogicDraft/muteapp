@@ -32,13 +32,19 @@ object PrefsManager {
     private const val KEY_SETTING_DND_LEVEL = "setting_dnd_level"
     private const val KEY_SETTING_AUTO_RESTORE_HOURS = "setting_auto_restore_hours"
     private const val KEY_SETTING_PERSISTENT_NOTIFICATION = "setting_persistent_notification"
-    private const val KEY_SETTING_DYNAMIC_COLOR = "setting_dynamic_color"
-    private const val KEY_SETTING_THEME = "setting_theme"
-    private const val KEY_SCHEDULES = "schedules_json"
+    private const val KEY_SETTING_WIDGET_SHAPE = "setting_widget_shape"
 
     const val THEME_SYSTEM = "system"
     const val THEME_LIGHT = "light"
     const val THEME_DARK = "dark"
+
+    const val SHAPE_ADAPTIVE = "adaptive"
+    const val SHAPE_CIRCLE = "circle"
+    const val SHAPE_SQUIRCLE = "squircle"
+    const val SHAPE_CLOVER = "clover"
+    const val SHAPE_TEARDROP = "teardrop"
+    const val SHAPE_FLOWER = "flower"
+    const val SHAPE_STARBURST = "starburst"
 
     enum class DndLevel { TOTAL_SILENCE, PRIORITY_ONLY }
 
@@ -186,5 +192,12 @@ object PrefsManager {
 
     fun setThemePreference(context: Context, theme: String) {
         prefs(context).edit().putString(KEY_SETTING_THEME, theme).apply()
+    }
+
+    fun getWidgetShapePreference(context: Context): String =
+        prefs(context).getString(KEY_SETTING_WIDGET_SHAPE, SHAPE_ADAPTIVE) ?: SHAPE_ADAPTIVE
+
+    fun setWidgetShapePreference(context: Context, shape: String) {
+        prefs(context).edit().putString(KEY_SETTING_WIDGET_SHAPE, shape).apply()
     }
 }

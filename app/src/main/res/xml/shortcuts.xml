@@ -1,47 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- TURN_ON_SILENT_MODE capability -->
+
+    <!-- Built-in Intent: TURN_ON_SILENT_MODE -->
     <capability android:name="actions.intent.TURN_ON_SILENT_MODE">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.logicdraftlabs.mute"
-            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            android:data="muto://mute">
             <parameter
                 android:name="action"
                 android:key="voice_action" />
         </intent>
     </capability>
 
-    <!-- TURN_OFF_SILENT_MODE capability -->
+    <!-- Built-in Intent: TURN_OFF_SILENT_MODE -->
     <capability android:name="actions.intent.TURN_OFF_SILENT_MODE">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.logicdraftlabs.mute"
-            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            android:data="muto://unmute">
             <parameter
                 android:name="action"
                 android:key="voice_action" />
         </intent>
     </capability>
 
-    <!-- Custom Mute capability for Gemini typed commands -->
+    <!-- Built-in Intent: OPEN_APP_FEATURE -->
+    <capability android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="muto://toggle">
+            <parameter
+                android:name="feature"
+                android:key="feature" />
+        </intent>
+    </capability>
+
+    <!-- Custom Mute capability for Gemini typed / spoken commands -->
     <capability android:name="custom.actions.intent.MUTE">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.logicdraftlabs.mute"
-            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            android:data="muto://mute">
             <parameter
                 android:name="action"
                 android:key="voice_action" />
         </intent>
     </capability>
 
-    <!-- Custom Unmute capability for Gemini typed commands -->
+    <!-- Custom Unmute capability for Gemini typed / spoken commands -->
     <capability android:name="custom.actions.intent.UNMUTE">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.logicdraftlabs.mute"
-            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            android:data="muto://unmute">
+            <parameter
+                android:name="action"
+                android:key="voice_action" />
+        </intent>
+    </capability>
+
+    <!-- Custom Toggle capability for Gemini typed / spoken commands -->
+    <capability android:name="custom.actions.intent.TOGGLE">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="muto://toggle">
             <parameter
                 android:name="action"
                 android:key="voice_action" />
@@ -60,8 +79,7 @@
         </capability-binding>
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.logicdraftlabs.mute"
-            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            android:data="muto://mute">
             <extra android:name="voice_action" android:value="mute" />
         </intent>
     </shortcut>
@@ -78,9 +96,22 @@
         </capability-binding>
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.logicdraftlabs.mute"
-            android:targetClass="com.logicdraftlabs.mute.ui.MainActivity">
+            android:data="muto://unmute">
             <extra android:name="voice_action" android:value="unmute" />
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_toggle"
+        android:shortcutShortLabel="Toggle Muto"
+        android:shortcutLongLabel="Toggle Muto Sound State">
+        <capability-binding android:key="custom.actions.intent.TOGGLE">
+            <parameter-binding android:key="voice_action" android:value="toggle" />
+        </capability-binding>
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="muto://toggle">
+            <extra android:name="voice_action" android:value="toggle" />
         </intent>
     </shortcut>
 </shortcuts>

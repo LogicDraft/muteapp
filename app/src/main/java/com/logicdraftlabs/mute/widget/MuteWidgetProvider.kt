@@ -30,11 +30,6 @@ class MuteWidgetProvider : AppWidgetProvider() {
     }
 
     companion object {
-        /**
-         * Called directly by MuteController right after a mute/unmute, so widgets reflect the
-         * new state immediately rather than waiting for the system's next update cycle.
-         * This updates both the classic RemoteViews widgets and the Glance widget.
-         */
         fun updateAllWidgets(context: Context) {
             MuteWidgetViews.updateProvider(
                 context = context,
@@ -46,7 +41,6 @@ class MuteWidgetProvider : AppWidgetProvider() {
                 provider = MuteWideWidgetProvider::class.java,
                 buildViews = MuteWidgetViews::buildWide
             )
-            // Also update the Glance widget so it reflects the new mute state immediately.
             MainScope().launch {
                 MuteGlanceWidget().updateAll(context)
             }
@@ -100,10 +94,6 @@ private object MuteWidgetViews {
 
         applyStateChrome(context, views, muted)
         views.setTextViewText(R.id.widget_detail, wideStatus(context, muted))
-        views.setTextColor(
-            R.id.widget_detail,
-            context.getColor(if (muted) R.color.signal_red else R.color.dim_grey)
-        )
         views.setOnClickPendingIntent(R.id.widget_root, togglePendingIntent(context))
         views.setContentDescription(
             R.id.widget_root,
@@ -113,23 +103,32 @@ private object MuteWidgetViews {
     }
 
     private fun applyStateChrome(context: Context, views: RemoteViews, muted: Boolean) {
-        views.setInt(
-            R.id.widget_root,
-            "setBackgroundResource",
-            if (muted) R.drawable.widget_bg_muted else R.drawable.widget_bg_active
-        )
+        val shapePref = PrefsManager.getWidgetShapePreference(context)
+
+        val bgDrawable = if (muted) {
+            when (shapePref) {
+                PrefsManager.SHAPE_CIRCLE -> R.drawable.widget_shape_circle
+                PrefsManager.SHAPE_CLOVER -> R.drawable.widget_shape_clover
+                PrefsManager.SHAPE_TEARDROP -> R.drawable.widget_shape_teardrop
+                PrefsManager.SHAPE_FLOWER -> R.drawable.widget_shape_flower
+                PrefsManager.SHAPE_STARBURST -> R.drawable.widget_shape_starburst
+                else -> R.drawable.widget_bg_muted
+            }
+        } else {
+            when (shapePref) {
+                PrefsManager.SHAPE_CIRCLE -> R.drawable.widget_shape_circle
+                PrefsManager.SHAPE_CLOVER -> R.drawable.widget_shape_clover
+                PrefsManager.SHAPE_TEARDROP -> R.drawable.widget_shape_teardrop
+                PrefsManager.SHAPE_FLOWER -> R.drawable.widget_shape_flower
+                PrefsManager.SHAPE_STARBURST -> R.drawable.widget_shape_starburst
+                else -> R.drawable.widget_bg_active
+            }
+        }
+
+        views.setInt(R.id.widget_root, "setBackgroundResource", bgDrawable)
         views.setImageViewResource(
             R.id.widget_icon,
             if (muted) R.drawable.ic_tile_muted else R.drawable.ic_tile_active
-        )
-        views.setInt(
-            R.id.widget_icon,
-            "setColorFilter",
-            context.getColor(if (muted) R.color.signal_red else R.color.pure_white)
-        )
-        views.setTextColor(
-            R.id.widget_text,
-            context.getColor(if (muted) R.color.signal_red else R.color.dim_grey)
         )
     }
 
@@ -182,4 +181,3 @@ private object MuteWidgetViews {
         )
     }
 }
-
