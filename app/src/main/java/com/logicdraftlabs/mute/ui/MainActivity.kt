@@ -159,18 +159,18 @@ class MainActivity : ComponentActivity() {
             when (targetAction) {
                 "mute", "on" -> {
                     if (!isCurrentlyMuted) {
-                        MuteController.toggleMute(this)
+                        MuteController.mute(this)
                     }
                     android.widget.Toast.makeText(this, R.string.widget_status_muted, android.widget.Toast.LENGTH_SHORT).show()
                 }
                 "unmute", "off" -> {
                     if (isCurrentlyMuted) {
-                        MuteController.toggleMute(this)
+                        MuteController.unmute(this)
                     }
                     android.widget.Toast.makeText(this, R.string.tile_label_active, android.widget.Toast.LENGTH_SHORT).show()
                 }
                 "toggle" -> {
-                    MuteController.toggleMute(this)
+                    MuteController.toggle(this)
                     val newStatus = if (MuteController.isMuted(this)) R.string.widget_status_muted else R.string.tile_label_active
                     android.widget.Toast.makeText(this, newStatus, android.widget.Toast.LENGTH_SHORT).show()
                 }
