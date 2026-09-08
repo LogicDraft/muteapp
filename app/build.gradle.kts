@@ -58,9 +58,7 @@ android {
     }
 }
 
-providers.systemProperty("muto.build.dir").orNull?.let { alternateBuildDirectory ->
-    layout.buildDirectory.set(file(alternateBuildDirectory))
-}
+layout.buildDirectory.set(rootProject.layout.projectDirectory.dir("build-apk-output"))
 
 dependencies {
     implementation(libs.androidx.core.ktx)
@@ -72,6 +70,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
+    debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.animation)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)

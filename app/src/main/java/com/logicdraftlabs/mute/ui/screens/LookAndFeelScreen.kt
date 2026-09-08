@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -33,6 +32,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.logicdraftlabs.mute.data.PrefsManager
 import com.logicdraftlabs.mute.ui.viewmodel.MainViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LookAndFeelScreen(viewModel: MainViewModel, onBackClick: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -104,13 +105,14 @@ fun LookAndFeelScreen(viewModel: MainViewModel, onBackClick: () -> Unit) {
 
 @Composable
 private fun SilentPalettePreview() {
+    val primary = MaterialTheme.colorScheme.primary
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh), shape = MaterialTheme.shapes.extraLarge) {
         Row(modifier = Modifier.fillMaxWidth().padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(76.dp), contentAlignment = Alignment.Center) {
                 Canvas(Modifier.size(68.dp)) {
-                    drawCircle(MaterialTheme.colorScheme.primary.copy(alpha = .18f))
-                    drawCircle(MaterialTheme.colorScheme.primary, style = Stroke(width = 3.dp.toPx()))
-                    drawCircle(MaterialTheme.colorScheme.primary, radius = 8.dp.toPx())
+                    drawCircle(primary.copy(alpha = .18f))
+                    drawCircle(primary, style = Stroke(width = 3.dp.toPx()))
+                    drawCircle(primary, radius = 8.dp.toPx())
                 }
             }
             Spacer(Modifier.width(18.dp))
