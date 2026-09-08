@@ -58,6 +58,10 @@ android {
     }
 }
 
+providers.systemProperty("muto.build.dir").orNull?.let { alternateBuildDirectory ->
+    layout.buildDirectory.set(file(alternateBuildDirectory))
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
@@ -76,4 +80,3 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.jdk9)
 }
-

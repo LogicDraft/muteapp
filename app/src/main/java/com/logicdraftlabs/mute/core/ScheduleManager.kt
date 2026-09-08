@@ -20,8 +20,17 @@ object ScheduleManager {
 
         for (schedule in schedules) {
             val windows = getNextWindows(schedule)
+            val activeWindow = windows.firstOrNull { now in it.start..it.end }
             val nextStart = windows.map { it.start }.filter { it > now }.minOrNull()
             val nextEnd = windows.map { it.end }.filter { it > now }.minOrNull()
+
+            if (activeWindow != null && !MuteController.isMuted(context)) {
+                MuteController.mute(
+                    context,
+                    source = PrefsManager.MuteSource.Scheduled(schedule.id),
+                    dndLevelOverride = schedule.dndLevel
+                )
+            }
 
             if (nextStart != null) {
                 arm(context, schedule.id, ScheduleReceiver.TRIGGER_START, nextStart)
@@ -81,14 +90,14 @@ object ScheduleManager {
     }
 
     /**
-     * Calculates the explicit start/end timestamp pairs for this schedule for the next 8 days.
+     * Calculates explicit start/end pairs from yesterday through the next week. Yesterday is
+     * included so an overnight schedule can be reconciled correctly after a reboot.
      */
     fun getNextWindows(schedule: Schedule): List<Window> {
         if (schedule.days.isEmpty()) return emptyList()
         val windows = mutableListOf<Window>()
         
-        // Check today and the next 7 days
-        for (i in 0..7) {
+        for (i in -1..7) {
             val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, i) }
             val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
             
@@ -118,11 +127,12 @@ object ScheduleManager {
     private fun arm(context: Context, scheduleId: String, triggerType: String, at: Long) {
         val alarm = context.getSystemService(AlarmManager::class.java) ?: return
         runCatching {
-            alarm.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                at,
-                pendingIntent(context, scheduleId, triggerType)
-            )
+            val pendingIntent = pendingIntent(context, scheduleId, triggerType)
+            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S || alarm.canScheduleExactAlarms()) {
+                alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
+            } else {
+                alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pendingIntent)
+            }
         }
     }
 

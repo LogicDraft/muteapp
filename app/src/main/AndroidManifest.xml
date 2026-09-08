@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <!-- Confirmation haptic on toggle. -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Re-arm user-created silence schedules after reboot. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Exact schedule starts when Android permits them; an inexact fallback is used otherwise. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
         android:name=".MuteApp"
@@ -111,6 +115,18 @@
                 <action android:name="com.logicdraftlabs.mute.action.TOGGLE_MUTE" />
                 <action android:name="com.logicdraftlabs.mute.action.MUTE" />
                 <action android:name="com.logicdraftlabs.mute.action.UNMUTE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receiver.ScheduleReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import com.logicdraftlabs.mute.ui.theme.MuteTheme
 
 object MutoMotion {
     const val Fast = 120
@@ -158,4 +160,20 @@ fun MuteStateLabel(isMuted: Boolean) {
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ReadyTogglePreview() {
+    MuteTheme(themePref = "light", dynamicColorsEnabled = false) {
+        MutoToggle(isMuted = false, onToggle = {})
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF151515)
+@Composable
+private fun SilentTogglePreview() {
+    MuteTheme(themePref = "dark", dynamicColorsEnabled = false) {
+        MutoToggle(isMuted = true, onToggle = {})
+    }
 }
