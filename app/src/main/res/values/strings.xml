@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Muto</string>
+    <string name="app_name">MUTO</string>
 
     <!-- Main screen -->
     <string name="status_muted">MUTE</string>
@@ -14,9 +14,9 @@
     <string name="usage_hint">Add the Muto Quick Settings tile or home-screen widget for one-tap access without opening the app.</string>
 
     <!-- Quick Settings tile -->
-    <string name="tile_label_muted">Muted</string>
+    <string name="tile_label_muted">Silent</string>
     <string name="tile_label_scheduled">Muted Â· until %1$s</string>
-    <string name="tile_label_active">Unmuted</string>
+    <string name="tile_label_active">Ready</string>
     <string name="tile_label_permission">Tap to allow</string>
 
     <!-- App Shortcuts & Voice Actions -->

@@ -26,6 +26,9 @@ object PrefsManager {
     private const val KEY_SAVED_RING_VOL = "saved_ring_vol"
     private const val KEY_SAVED_RINGER_MODE = "saved_ringer_mode"
     private const val KEY_SAVED_INTERRUPTION_FILTER = "saved_interruption_filter"
+    private const val KEY_SAVED_SYSTEM_VOL = "saved_system_vol"
+    private const val KEY_SAVED_MUTO_CHANGED_DND = "saved_muto_changed_dnd"
+    private const val KEY_SAVED_MUTO_DND_FILTER = "saved_muto_dnd_filter"
     private const val KEY_AUTO_RESTORE_AT = "auto_restore_at_millis"
 
     private const val KEY_SETTING_EXCLUDE_ALARM = "setting_exclude_alarm"
@@ -35,6 +38,13 @@ object PrefsManager {
     private const val KEY_SETTING_DYNAMIC_COLOR = "setting_dynamic_color"
     private const val KEY_SETTING_THEME = "setting_theme"
     private const val KEY_SETTING_WIDGET_SHAPE = "setting_widget_shape"
+    private const val KEY_SETTING_MUTE_MEDIA = "setting_mute_media"
+    private const val KEY_SETTING_MUTE_RINGTONE = "setting_mute_ringtone"
+    private const val KEY_SETTING_MUTE_NOTIFICATIONS = "setting_mute_notifications"
+    private const val KEY_SETTING_MUTE_SYSTEM = "setting_mute_system"
+    private const val KEY_SETTING_MUTE_ALARMS = "setting_mute_alarms"
+    private const val KEY_SETTING_ENABLE_DND = "setting_enable_dnd"
+    private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
     private const val KEY_SCHEDULES = "schedules_json"
 
     const val THEME_SYSTEM = "system"
@@ -63,8 +73,11 @@ object PrefsManager {
         val mediaVolume: Int,
         val notificationVolume: Int,
         val ringVolume: Int,
+        val systemVolume: Int,
         val ringerMode: Int,
-        val interruptionFilter: Int
+        val interruptionFilter: Int,
+        val mutoChangedDnd: Boolean,
+        val mutoDndFilter: Int
     )
 
     private fun prefs(context: Context): SharedPreferences =
@@ -116,8 +129,11 @@ object PrefsManager {
             .putInt(KEY_SAVED_MEDIA_VOL, state.mediaVolume)
             .putInt(KEY_SAVED_NOTIF_VOL, state.notificationVolume)
             .putInt(KEY_SAVED_RING_VOL, state.ringVolume)
+            .putInt(KEY_SAVED_SYSTEM_VOL, state.systemVolume)
             .putInt(KEY_SAVED_RINGER_MODE, state.ringerMode)
             .putInt(KEY_SAVED_INTERRUPTION_FILTER, state.interruptionFilter)
+            .putBoolean(KEY_SAVED_MUTO_CHANGED_DND, state.mutoChangedDnd)
+            .putInt(KEY_SAVED_MUTO_DND_FILTER, state.mutoDndFilter)
             .apply()
     }
 
@@ -130,9 +146,26 @@ object PrefsManager {
             mediaVolume = p.getInt(KEY_SAVED_MEDIA_VOL, 0),
             notificationVolume = p.getInt(KEY_SAVED_NOTIF_VOL, 0),
             ringVolume = p.getInt(KEY_SAVED_RING_VOL, 0),
+            systemVolume = p.getInt(KEY_SAVED_SYSTEM_VOL, 0),
             ringerMode = p.getInt(KEY_SAVED_RINGER_MODE, 0),
-            interruptionFilter = p.getInt(KEY_SAVED_INTERRUPTION_FILTER, 0)
+            interruptionFilter = p.getInt(KEY_SAVED_INTERRUPTION_FILTER, 0),
+            mutoChangedDnd = p.getBoolean(KEY_SAVED_MUTO_CHANGED_DND, false),
+            mutoDndFilter = p.getInt(KEY_SAVED_MUTO_DND_FILTER, 0)
         )
+    }
+
+    fun clearSavedAudioState(context: Context) {
+        prefs(context).edit()
+            .remove(KEY_SAVED_ALARM_VOL)
+            .remove(KEY_SAVED_MEDIA_VOL)
+            .remove(KEY_SAVED_NOTIF_VOL)
+            .remove(KEY_SAVED_RING_VOL)
+            .remove(KEY_SAVED_SYSTEM_VOL)
+            .remove(KEY_SAVED_RINGER_MODE)
+            .remove(KEY_SAVED_INTERRUPTION_FILTER)
+            .remove(KEY_SAVED_MUTO_CHANGED_DND)
+            .remove(KEY_SAVED_MUTO_DND_FILTER)
+            .apply()
     }
 
     // --- Auto-restore target time (absolute wall-clock millis, survives reboot) -------------
@@ -152,11 +185,32 @@ object PrefsManager {
     // --- Settings ---------------------------------------------------------------------------
 
     fun getExcludeAlarm(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_SETTING_EXCLUDE_ALARM, false)
+        prefs(context).getBoolean(KEY_SETTING_EXCLUDE_ALARM, true)
 
     fun setExcludeAlarm(context: Context, exclude: Boolean) {
         prefs(context).edit().putBoolean(KEY_SETTING_EXCLUDE_ALARM, exclude).apply()
     }
+
+    fun getMuteMedia(context: Context): Boolean = prefs(context).getBoolean(KEY_SETTING_MUTE_MEDIA, true)
+    fun setMuteMedia(context: Context, enabled: Boolean) = prefs(context).edit().putBoolean(KEY_SETTING_MUTE_MEDIA, enabled).apply()
+
+    fun getMuteRingtone(context: Context): Boolean = prefs(context).getBoolean(KEY_SETTING_MUTE_RINGTONE, true)
+    fun setMuteRingtone(context: Context, enabled: Boolean) = prefs(context).edit().putBoolean(KEY_SETTING_MUTE_RINGTONE, enabled).apply()
+
+    fun getMuteNotifications(context: Context): Boolean = prefs(context).getBoolean(KEY_SETTING_MUTE_NOTIFICATIONS, true)
+    fun setMuteNotifications(context: Context, enabled: Boolean) = prefs(context).edit().putBoolean(KEY_SETTING_MUTE_NOTIFICATIONS, enabled).apply()
+
+    fun getMuteSystem(context: Context): Boolean = prefs(context).getBoolean(KEY_SETTING_MUTE_SYSTEM, true)
+    fun setMuteSystem(context: Context, enabled: Boolean) = prefs(context).edit().putBoolean(KEY_SETTING_MUTE_SYSTEM, enabled).apply()
+
+    fun getMuteAlarms(context: Context): Boolean = prefs(context).getBoolean(KEY_SETTING_MUTE_ALARMS, false)
+    fun setMuteAlarms(context: Context, enabled: Boolean) = prefs(context).edit().putBoolean(KEY_SETTING_MUTE_ALARMS, enabled).apply()
+
+    fun getEnableDnd(context: Context): Boolean = prefs(context).getBoolean(KEY_SETTING_ENABLE_DND, true)
+    fun setEnableDnd(context: Context, enabled: Boolean) = prefs(context).edit().putBoolean(KEY_SETTING_ENABLE_DND, enabled).apply()
+
+    fun isOnboardingComplete(context: Context): Boolean = prefs(context).getBoolean(KEY_ONBOARDING_COMPLETE, false)
+    fun setOnboardingComplete(context: Context, complete: Boolean) = prefs(context).edit().putBoolean(KEY_ONBOARDING_COMPLETE, complete).apply()
 
     fun getDndLevel(context: Context): DndLevel {
         val name = prefs(context).getString(KEY_SETTING_DND_LEVEL, DndLevel.TOTAL_SILENCE.name)
@@ -177,7 +231,7 @@ object PrefsManager {
     }
 
     fun getShowPersistentNotification(context: Context): Boolean =
-        prefs(context).getBoolean(KEY_SETTING_PERSISTENT_NOTIFICATION, true)
+        prefs(context).getBoolean(KEY_SETTING_PERSISTENT_NOTIFICATION, false)
 
     fun setShowPersistentNotification(context: Context, show: Boolean) {
         prefs(context).edit().putBoolean(KEY_SETTING_PERSISTENT_NOTIFICATION, show).apply()

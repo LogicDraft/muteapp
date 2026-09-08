@@ -4,10 +4,6 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Build
-import android.provider.Settings
-import android.text.format.DateFormat
-import java.util.Calendar
-import com.logicdraftlabs.mute.data.PrefsManager
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.logicdraftlabs.mute.R
@@ -25,10 +21,6 @@ class MuteTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
-        if (!MuteController.isDndAccessGranted(this)) {
-            openPermissionSettings()
-            return
-        }
         MuteController.toggle(this)
         refreshTile()
     }
@@ -41,12 +33,10 @@ class MuteTileService : TileService() {
 
     private fun refreshTile() {
         val tile = qsTile ?: return
-        val granted = MuteController.isDndAccessGranted(this)
         val muted = MuteController.isMuted(this)
 
         val visual = when {
-            !granted -> TileVisual(Tile.STATE_INACTIVE, R.drawable.ic_tile_muted, getString(R.string.tile_label_permission))
-            muted -> TileVisual(Tile.STATE_ACTIVE, R.drawable.ic_tile_muted, scheduledSubtitle())
+            muted -> TileVisual(Tile.STATE_ACTIVE, R.drawable.ic_tile_muted, getString(R.string.tile_label_muted))
             else -> TileVisual(Tile.STATE_INACTIVE, R.drawable.ic_tile_active, getString(R.string.tile_label_active))
         }
 
@@ -62,37 +52,6 @@ class MuteTileService : TileService() {
         tile.updateTile()
     }
 
-    private fun scheduledSubtitle(): String {
-        val source = PrefsManager.getMuteSource(this)
-        if (source is PrefsManager.MuteSource.Scheduled) {
-            val schedules = PrefsManager.getSchedules(this).filter { it.enabled }
-            val schedule = schedules.find { it.id == source.scheduleId }
-            if (schedule != null) {
-                val now = System.currentTimeMillis()
-                val currentWindow = com.logicdraftlabs.mute.core.ScheduleManager.getNextWindows(schedule).find { now in it.start..it.end }
-                if (currentWindow != null) {
-                    val c = Calendar.getInstance().apply { timeInMillis = currentWindow.end }
-                    return getString(R.string.tile_label_scheduled, DateFormat.getTimeFormat(this).format(c.time))
-                }
-            }
-        }
-        return getString(R.string.tile_label_muted)
-    }
-
-    private fun openPermissionSettings() {
-        val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            val pendingIntent = PendingIntent.getActivity(
-                this, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            startActivityAndCollapse(pendingIntent)
-        } else {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            @Suppress("DEPRECATION")
-            startActivityAndCollapse(intent)
-        }
-    }
 }
 
 

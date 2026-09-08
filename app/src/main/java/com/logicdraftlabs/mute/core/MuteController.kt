@@ -38,16 +38,12 @@ object MuteController {
     fun isMuted(context: Context): Boolean = PrefsManager.isMutedByApp(context)
 
     /**
-     * Flips the current state. If DND access isn't granted yet, nothing is muted or unmuted -
-     * instead the app opens to walk the user through granting it once.
+     * Flips the current state. Volume muting remains available without DND access; DND is an
+     * optional enhancement that Android grants separately.
      * Returns the resulting muted state.
      */
     fun toggle(context: Context): Boolean {
         val app = context.applicationContext
-        if (!isDndAccessGranted(app)) {
-            launchAppForPermission(app)
-            return isMuted(app)
-        }
         return if (isMuted(app)) {
             unmute(app, MuteSource.Manual)
             false
@@ -67,32 +63,49 @@ object MuteController {
         val notificationManager = app.getSystemService(NotificationManager::class.java) ?: return
 
         // 1. Snapshot exactly what the phone was doing, so restore is exact - not a guess.
+        val previousFilter = notificationManager.currentInterruptionFilter
+        val wantsDnd = PrefsManager.getEnableDnd(app) && isDndAccessGranted(app)
+        val targetDndLevel = dndLevelOverride ?: PrefsManager.getDndLevel(app)
+        val targetFilter = when (targetDndLevel) {
+            PrefsManager.DndLevel.TOTAL_SILENCE -> NotificationManager.INTERRUPTION_FILTER_NONE
+            PrefsManager.DndLevel.PRIORITY_ONLY -> NotificationManager.INTERRUPTION_FILTER_PRIORITY
+        }
         val snapshot = PrefsManager.SavedAudioState(
             alarmVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM),
             mediaVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),
             notificationVolume = audioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION),
             ringVolume = audioManager.getStreamVolume(AudioManager.STREAM_RING),
+            systemVolume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM),
             ringerMode = audioManager.ringerMode,
-            interruptionFilter = notificationManager.currentInterruptionFilter
+            interruptionFilter = previousFilter,
+            mutoChangedDnd = wantsDnd && previousFilter == NotificationManager.INTERRUPTION_FILTER_ALL,
+            mutoDndFilter = targetFilter
         )
         PrefsManager.saveAudioState(app, snapshot)
 
-        // 2. Zero the streams first, while the filter is still normal, so the OS doesn't fight us.
-        val excludeAlarm = PrefsManager.getExcludeAlarm(app)
-        runCatching {
-            if (!excludeAlarm) audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 0, 0)
-            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0)
-            audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, 0, 0)
-            audioManager.setStreamVolume(AudioManager.STREAM_RING, 0, 0)
+        // 2. Zero only the streams explicitly selected by the user.
+        val mutedStreams = buildList {
+            if (PrefsManager.getMuteMedia(app)) add(AudioManager.STREAM_MUSIC)
+            if (PrefsManager.getMuteRingtone(app)) add(AudioManager.STREAM_RING)
+            if (PrefsManager.getMuteNotifications(app)) add(AudioManager.STREAM_NOTIFICATION)
+            if (PrefsManager.getMuteSystem(app)) add(AudioManager.STREAM_SYSTEM)
+            if (PrefsManager.getMuteAlarms(app)) add(AudioManager.STREAM_ALARM)
+        }
+        val streamsChanged = runCatching {
+            mutedStreams.forEach { stream -> audioManager.setStreamVolume(stream, 0, 0) }
+            mutedStreams.all { stream -> audioManager.getStreamVolume(stream) == 0 }
+        }.getOrDefault(false)
+        if (!streamsChanged && mutedStreams.isNotEmpty()) {
+            restoreSnapshot(audioManager, snapshot)
+            PrefsManager.clearSavedAudioState(app)
+            refreshSurfaces(app)
+            return
         }
 
-        // 3. Now engage Do Not Disturb on top of that.
-        val targetDndLevel = dndLevelOverride ?: PrefsManager.getDndLevel(app)
-        val filter = when (targetDndLevel) {
-            PrefsManager.DndLevel.TOTAL_SILENCE -> NotificationManager.INTERRUPTION_FILTER_NONE
-            PrefsManager.DndLevel.PRIORITY_ONLY -> NotificationManager.INTERRUPTION_FILTER_PRIORITY
+        // 3. DND is never changed when it was already in the desired state or access is absent.
+        if (snapshot.mutoChangedDnd) {
+            runCatching { notificationManager.setInterruptionFilter(targetFilter) }
         }
-        runCatching { notificationManager.setInterruptionFilter(filter) }
 
         PrefsManager.setMuteSource(app, source)
         PrefsManager.setMutedByApp(app, true)
@@ -110,11 +123,13 @@ object MuteController {
         val notificationManager = app.getSystemService(NotificationManager::class.java) ?: return
         val saved = PrefsManager.readSavedAudioState(app)
 
-        // 1. Lift Do Not Disturb first - some OEMs ignore ring-volume changes while it's on.
-        runCatching {
-            notificationManager.setInterruptionFilter(
-                saved?.interruptionFilter ?: NotificationManager.INTERRUPTION_FILTER_ALL
-            )
+        // 1. Restore DND only when MUTO enabled it. A pre-existing DND state stays untouched.
+        if (
+            saved?.mutoChangedDnd == true &&
+            isDndAccessGranted(app) &&
+            notificationManager.currentInterruptionFilter == saved.mutoDndFilter
+        ) {
+            runCatching { notificationManager.setInterruptionFilter(saved.interruptionFilter) }
         }
 
         // 2. Then restore every stream to exactly what it was.
@@ -124,11 +139,13 @@ object MuteController {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, saved.mediaVolume, 0)
                 audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, saved.notificationVolume, 0)
                 audioManager.setStreamVolume(AudioManager.STREAM_RING, saved.ringVolume, 0)
+                audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, saved.systemVolume, 0)
                 audioManager.ringerMode = saved.ringerMode
             }
         }
 
         PrefsManager.setMutedByApp(app, false)
+        PrefsManager.clearSavedAudioState(app)
         cancelAutoRestore(app)
         MuteNotificationHelper.cancel(app)
         vibrate(app)
@@ -204,6 +221,20 @@ object MuteController {
             context.getSystemService(Vibrator::class.java)
         }
         vibrator?.vibrate(VibrationEffect.createOneShot(60, VibrationEffect.DEFAULT_AMPLITUDE))
+    }
+
+    private fun restoreSnapshot(
+        audioManager: AudioManager,
+        snapshot: PrefsManager.SavedAudioState
+    ) {
+        runCatching {
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, snapshot.alarmVolume, 0)
+            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, snapshot.mediaVolume, 0)
+            audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, snapshot.notificationVolume, 0)
+            audioManager.setStreamVolume(AudioManager.STREAM_RING, snapshot.ringVolume, 0)
+            audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, snapshot.systemVolume, 0)
+            audioManager.ringerMode = snapshot.ringerMode
+        }
     }
 
     /** Pushes the new state to every surface that shows it: widgets, the QS tile, and any open UI. */

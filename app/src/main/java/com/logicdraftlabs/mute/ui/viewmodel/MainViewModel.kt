@@ -48,6 +48,21 @@ class MainViewModel : ViewModel() {
     private val _showPersistentNotification = MutableStateFlow(false)
     val showPersistentNotification: StateFlow<Boolean> = _showPersistentNotification.asStateFlow()
 
+    private val _muteMedia = MutableStateFlow(true)
+    val muteMedia: StateFlow<Boolean> = _muteMedia.asStateFlow()
+    private val _muteRingtone = MutableStateFlow(true)
+    val muteRingtone: StateFlow<Boolean> = _muteRingtone.asStateFlow()
+    private val _muteNotifications = MutableStateFlow(true)
+    val muteNotifications: StateFlow<Boolean> = _muteNotifications.asStateFlow()
+    private val _muteSystem = MutableStateFlow(true)
+    val muteSystem: StateFlow<Boolean> = _muteSystem.asStateFlow()
+    private val _muteAlarms = MutableStateFlow(false)
+    val muteAlarms: StateFlow<Boolean> = _muteAlarms.asStateFlow()
+    private val _enableDnd = MutableStateFlow(true)
+    val enableDnd: StateFlow<Boolean> = _enableDnd.asStateFlow()
+    private val _onboardingComplete = MutableStateFlow(false)
+    val onboardingComplete: StateFlow<Boolean> = _onboardingComplete.asStateFlow()
+
     init {
         viewModelScope.launch {
             MuteStateBus.changes.collect {
@@ -69,6 +84,13 @@ class MainViewModel : ViewModel() {
         _dynamicColorsEnabled.value = PrefsManager.isDynamicColorEnabled(app)
         _excludeAlarm.value = PrefsManager.getExcludeAlarm(app)
         _showPersistentNotification.value = PrefsManager.getShowPersistentNotification(app)
+        _muteMedia.value = PrefsManager.getMuteMedia(app)
+        _muteRingtone.value = PrefsManager.getMuteRingtone(app)
+        _muteNotifications.value = PrefsManager.getMuteNotifications(app)
+        _muteSystem.value = PrefsManager.getMuteSystem(app)
+        _muteAlarms.value = PrefsManager.getMuteAlarms(app)
+        _enableDnd.value = PrefsManager.getEnableDnd(app)
+        _onboardingComplete.value = PrefsManager.isOnboardingComplete(app)
     }
 
     fun toggleMute(context: Context): Boolean {
@@ -119,6 +141,14 @@ class MainViewModel : ViewModel() {
         PrefsManager.setExcludeAlarm(context, exclude)
         _excludeAlarm.value = exclude
     }
+
+    fun setMuteMedia(context: Context, enabled: Boolean) { PrefsManager.setMuteMedia(context, enabled); _muteMedia.value = enabled }
+    fun setMuteRingtone(context: Context, enabled: Boolean) { PrefsManager.setMuteRingtone(context, enabled); _muteRingtone.value = enabled }
+    fun setMuteNotifications(context: Context, enabled: Boolean) { PrefsManager.setMuteNotifications(context, enabled); _muteNotifications.value = enabled }
+    fun setMuteSystem(context: Context, enabled: Boolean) { PrefsManager.setMuteSystem(context, enabled); _muteSystem.value = enabled }
+    fun setMuteAlarms(context: Context, enabled: Boolean) { PrefsManager.setMuteAlarms(context, enabled); _muteAlarms.value = enabled }
+    fun setEnableDnd(context: Context, enabled: Boolean) { PrefsManager.setEnableDnd(context, enabled); _enableDnd.value = enabled }
+    fun completeOnboarding(context: Context) { PrefsManager.setOnboardingComplete(context, true); _onboardingComplete.value = true }
 
     fun setShowPersistentNotification(context: Context, show: Boolean) {
         PrefsManager.setShowPersistentNotification(context, show)

@@ -6,10 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <!-- Confirmation haptic on toggle. -->
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- Re-arm the optional auto-restore timer after a reboot. -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- Android 13+ runtime permission for the persistent "Silent mode on" notification. -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".MuteApp"
@@ -67,36 +63,6 @@
             android:label="@string/settings_title"
             android:theme="@style/Theme.Mute" />
 
-        <activity
-            android:name=".ui.DndSettingsActivity"
-            android:exported="false"
-            android:label="@string/settings_dnd_title"
-            android:theme="@style/Theme.Mute" />
-
-        <activity
-            android:name=".ui.NotificationsSettingsActivity"
-            android:exported="false"
-            android:label="@string/settings_notifications_title"
-            android:theme="@style/Theme.Mute" />
-
-
-        <activity
-            android:name=".ui.AboutActivity"
-            android:exported="false"
-            android:label="@string/settings_about_title"
-            android:theme="@style/Theme.Mute" />
-
-        <activity
-            android:name=".ui.LookAndFeelActivity"
-            android:exported="false"
-            android:label="@string/settings_look_feel_title"
-            android:theme="@style/Theme.Mute" />
-
-        <activity
-            android:name=".ui.PrivacyPolicyActivity"
-            android:exported="false"
-            android:label="Privacy Policy"
-            android:theme="@style/Theme.Mute" />
 
         <!-- Quick Settings tile: the primary, no-app-UI entry point. -->
         <service
@@ -148,23 +114,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- Re-arms the auto-restore AlarmManager alarm after a reboot (alarms don't survive one). -->
-        <receiver
-            android:name=".receiver.BootReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <!-- Fires the optional "auto-unmute after N hours" safety net. -->
-        <receiver
-            android:name=".receiver.AutoRestoreReceiver"
-            android:exported="false" />
-
-        <!-- Daily scheduled silence start/end alarms. -->
-        <receiver android:name=".receiver.ScheduleReceiver" android:exported="false" />
-
         <!-- Jetpack Glance widget: Material You / dynamic-color aware 1x1 home-screen widget. -->
         <receiver
             android:name=".widget.MuteGlanceWidgetReceiver"
@@ -176,26 +125,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_mute_glance_info" />
         </receiver>
-        <activity
-            android:name=".ui.SchedulesActivity"
-            android:exported="false"
-            android:label="@string/schedules_title" />
-
-        <activity
-            android:name=".ui.ScheduleEditActivity"
-            android:exported="false"
-            android:label="@string/schedule_add"
-            android:windowSoftInputMode="adjustResize" />
-
-        <service
-            android:name=".controls.MuteControlsProviderService"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_CONTROLS">
-            <intent-filter>
-                <action android:name="android.service.controls.ControlsProviderService" />
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>
